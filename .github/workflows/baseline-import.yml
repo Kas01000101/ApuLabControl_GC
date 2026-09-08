@@ -1,0 +1,141 @@
+name: Import protected experimental baseline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/baseline-import.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  SOURCE_REPO: Kas01000101/ApuLabStationGame
+  SOURCE_SHA: 2f94e9e701172ab455767757225110606b983597
+  SOURCE_TREE: e5651dcaee3f6d1c180a4a755b582e44735bd2c4
+  DEST_REPO: Kas01000101/ApuLabControl_GC
+
+jobs:
+  baseline:
+    if: github.repository == 'Kas01000101/ApuLabControl_GC'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout destination only
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Guard destination repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "$DEST_REPO"
+          if [ "$GITHUB_REPOSITORY" = "$SOURCE_REPO" ]; then
+            echo 'WRITE_BLOCKED_PROTECTED_REPOSITORY'
+            exit 1
+          fi
+
+      - name: Clone protected source read-only at exact snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --no-tags "https://github.com/${SOURCE_REPO}.git" /tmp/apulab-source
+          git -C /tmp/apulab-source checkout --detach "$SOURCE_SHA"
+          test "$(git -C /tmp/apulab-source rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git -C /tmp/apulab-source rev-parse HEAD^{tree})" = "$SOURCE_TREE"
+
+      - name: Verify source snapshot builds and generates N1-N7
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/apulab-source
+          npm ci --no-fund --no-audit
+          npm run build
+          for level in 1 2 3 4 5 6 7; do
+            test -f "public/missions/mission01/level${level}.html"
+          done
+          test -f public/missions/mission01/manifest.json
+          echo 'BUILD_STATUS=PASS' >> "$GITHUB_STEP_SUMMARY"
+          echo 'N1_N7_GENERATED=YES' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Restore protected source working tree exactly
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C /tmp/apulab-source reset --hard "$SOURCE_SHA"
+          git -C /tmp/apulab-source clean -fdx
+          test "$(git -C /tmp/apulab-source rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git -C /tmp/apulab-source rev-parse HEAD^{tree})" = "$SOURCE_TREE"
+          test -z "$(git -C /tmp/apulab-source status --porcelain)"
+
+      - name: Replace destination working tree with exact source snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -a --delete --exclude='.git/' /tmp/apulab-source/ ./
+          test ! -e .baseline-init
+          test ! -e .github/workflows/baseline-import.yml
+
+      - name: Verify byte-equivalent Git tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A
+          DEST_TREE="$(git write-tree)"
+          SOURCE_TREE_ACTUAL="$(git -C /tmp/apulab-source rev-parse HEAD^{tree})"
+          echo "SOURCE_TREE=${SOURCE_TREE_ACTUAL}" >> "$GITHUB_STEP_SUMMARY"
+          echo "DEST_TREE=${DEST_TREE}" >> "$GITHUB_STEP_SUMMARY"
+          test "$DEST_TREE" = "$SOURCE_TREE_ACTUAL"
+          test "$DEST_TREE" = "$SOURCE_TREE"
+
+      - name: Commit baseline with source provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'ApuLab Control Baseline'
+          git config user.email 'actions@users.noreply.github.com'
+          git commit \
+            -m 'chore(control): import experimental study baseline' \
+            -m "CONTROL_SOURCE_REPO=${SOURCE_REPO}" \
+            -m "CONTROL_SOURCE_COMMIT=${SOURCE_SHA}" \
+            -m "CONTROL_SOURCE_TREE=${SOURCE_TREE}"
+          test "$(git rev-parse HEAD^{tree})" = "$SOURCE_TREE"
+          echo "CONTROL_BASELINE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Guard push target and publish baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          PUSH_URL="$(git remote get-url --push origin)"
+          echo "PUSH_TARGET=${PUSH_URL}" >> "$GITHUB_STEP_SUMMARY"
+          case "$PUSH_URL" in
+            *Kas01000101/ApuLabControl_GC*) ;;
+            *)
+              echo 'FATAL_PROTECTED_SOURCE_PUSH_ATTEMPT'
+              exit 1
+              ;;
+          esac
+          if printf '%s' "$PUSH_URL" | grep -Fq 'ApuLabStationGame'; then
+            echo 'FATAL_PROTECTED_SOURCE_PUSH_ATTEMPT'
+            exit 1
+          fi
+          git push origin HEAD:main
+
+      - name: Protection report
+        shell: bash
+        run: |
+          {
+            echo 'PROTECTED SOURCE CHECK'
+            echo 'Source repository: Kas01000101/ApuLabStationGame'
+            echo 'Source files modified: NO'
+            echo 'Source commits created: NO'
+            echo 'Source branches created: NO'
+            echo 'Source PRs modified: NO'
+            echo 'Source pushes: NO'
+            echo 'Destination repository: Kas01000101/ApuLabControl_GC'
+            echo 'Destination modified: YES'
+          } >> "$GITHUB_STEP_SUMMARY"
