@@ -82,6 +82,11 @@ jobs:
           APULAB_BASE_URL: http://127.0.0.1:4173
         run: node tests/e2e/mission01-control-n1-telemetry.cjs
 
+      - name: N1 frozen participant-view contract
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-control-n1-freeze.cjs
+
       - name: App shell regression
         env:
           APULAB_BASE_URL: http://127.0.0.1:4173
