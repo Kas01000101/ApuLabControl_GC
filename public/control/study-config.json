@@ -1,0 +1,17 @@
+{
+  "version": "apulab-control-study-config-v1",
+  "sourceRepository": "Kas01000101/ApuLabStationGame",
+  "sourceCommit": "2f94e9e701172ab455767757225110606b983597",
+  "level2": {
+    "batteries": [
+      { "id": "A", "voltage": 24.0 },
+      { "id": "B", "voltage": 28.0 },
+      { "id": "C", "voltage": 32.0 }
+    ],
+    "requiredVoltage": {
+      "minExclusive": 24.0,
+      "maxExclusive": 32.0
+    },
+    "correctBatteryId": "B"
+  }
+}
