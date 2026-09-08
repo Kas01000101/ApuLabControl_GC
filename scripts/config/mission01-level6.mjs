@@ -1,0 +1,25 @@
+export const LEVEL6_CONFIG = Object.freeze({
+  level: 6,
+  totalLevels: 7,
+  title: 'INVESTIGAR',
+  subtitle: 'DATOS CIENTÍFICOS · Obtén, interpreta y comunica el resultado.',
+  objective: 'OBJETIVO · INVESTIGA LA ZONA Y ENVÍA EL RESULTADO',
+  start: { c: 1, r: 5, dir: 1 },
+  goal: { c: 4, r: 5 },
+  scientificZone: { c: 4, r: 5 },
+  communicationZone: { c: 4, r: 2 },
+  obstacles: [[0,1],[2,2],[6,1],[7,5]],
+  explore: [
+    { title: 'ZONA DE INTERÉS', text: 'AYNI puede obtener información cuando llega a la zona científica cyan.', hint: 'Primero llega a la zona y observa qué dato puedes obtener.', focus: 'board' },
+    { title: 'OBTENER', text: 'ESCANEAR registra información del entorno.', hint: 'Un dato todavía necesita ser interpretado.', focus: 'palette' },
+    { title: 'INTERPRETAR', text: 'ANALIZAR ayuda a entender el dato que AYNI ya obtuvo.', hint: 'Primero obtén información; después interprétala.', focus: 'palette' },
+    { title: 'COMUNICAR', text: 'El resultado debe llegar al punto de comunicación antes de enviarse a ApuLab Station.', hint: 'ENVIAR DATOS comunica el resultado a la estación.', focus: 'board' },
+  ],
+  guide: [
+    ['LLEGA A LA ZONA DE INTERÉS', 'Lleva AYNI hasta la zona científica cyan.'],
+    ['OBTÉN INFORMACIÓN', 'Usa ESCANEAR cuando AYNI esté en la zona de interés.'],
+    ['INTERPRETA EL DATO', 'Después del escaneo, usa ANALIZAR para entender la información.'],
+    ['VE AL PUNTO DE COMUNICACIÓN', 'Con el resultado listo, lleva AYNI hasta la baliza de comunicación.'],
+    ['ENVÍA EL RESULTADO', 'Desde el punto de comunicación, usa ENVIAR DATOS para comunicarlo a ApuLab Station.'],
+  ],
+});
