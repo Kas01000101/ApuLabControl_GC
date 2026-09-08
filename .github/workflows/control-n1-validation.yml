@@ -1,0 +1,133 @@
+name: Control N1 Validation Gate
+
+on:
+  push:
+    branches:
+      - research/control-active
+
+permissions:
+  contents: read
+
+jobs:
+  validate-n1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Checkout control branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22.16.0'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-fund --no-audit
+
+      - name: Build complete control clone
+        run: npm run build
+
+      - name: Static N1 control audit
+        run: node scripts/audit-mission01-control-n1.mjs
+
+      - name: Verify N2-N7 generated outputs unchanged from baseline main
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p test-results/n1-control
+          : > test-results/n1-control/n2-n7-hashes.txt
+          for level in 2 3 4 5 6 7; do
+            baseline="$(git show origin/main:public/missions/mission01/level${level}.html | sha256sum | awk '{print $1}')"
+            current="$(sha256sum public/missions/mission01/level${level}.html | awk '{print $1}')"
+            printf 'level%s baseline=%s current=%s\n' "$level" "$baseline" "$current" | tee -a test-results/n1-control/n2-n7-hashes.txt
+            test "$baseline" = "$current"
+          done
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --global playwright@1.55.0 --no-fund --no-audit
+          playwright install --with-deps chromium
+          echo "NODE_PATH=$(npm root -g)" >> "$GITHUB_ENV"
+
+      - name: Start production-mode preview
+        shell: bash
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/apulab-control-preview.log 2>&1 &
+          echo $! > /tmp/apulab-control-preview.pid
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/apulab-control-preview.log
+          exit 1
+
+      - name: N1 physical + refresh + idempotency + N2 baseline E2E
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-electronics.cjs
+
+      - name: N1 parent telemetry bridge + privacy + audio gate E2E
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-control-n1-telemetry.cjs
+
+      - name: App shell regression
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/app-shell.cjs
+
+      - name: N1-N7 smoke regression
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-smoke.cjs
+
+      - name: SFX contract regression
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-sfx.cjs
+
+      - name: N3-N6 gameplay regression
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-gameplay-n3-n6.cjs
+
+      - name: N5 loops regression
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-level5-final-loops.cjs
+
+      - name: N6 parity regression
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: |
+          node tests/e2e/mission01-level6-n5-parity.cjs
+          node tests/e2e/mission01-level6-navigation-identity.cjs
+          node tests/e2e/mission01-level6-contract.cjs
+          node tests/e2e/mission01-level6-final-position.cjs
+
+      - name: N7 parity regression
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: |
+          node tests/e2e/mission01-level7-n6-parity.cjs
+          node tests/e2e/mission01-level7-contract.cjs
+
+      - name: Upload N1 QA evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: control-n1-validation-evidence
+          path: |
+            test-results/electronics
+            test-results/n1-control
+            test-results/app-shell
+            test-results/smoke
+          if-no-files-found: ignore
+          retention-days: 5
+
+      - name: Print preview log on failure
+        if: failure()
+        run: cat /tmp/apulab-control-preview.log || true
