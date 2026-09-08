@@ -22,8 +22,8 @@
 .control-meter-display{height:92px;border:3px solid #3e4d42;border-radius:8px;background:#d9e5d4;display:flex;align-items:center;justify-content:flex-end;padding:0 22px;font:800 39px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#26332b;letter-spacing:.02em}
 .control-meter-display.is-off{background:#9aa49b;color:#3c463e}
 .control-meter-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
-.control-power{min-width:112px;min-height:50px;border:2px solid #3f4c59;border-radius:8px;background:#fff;font:800 15px/1 "Poppins",Arial,sans-serif;cursor:pointer}
-.control-power[aria-pressed="true"]{background:#dfe7ed}
+.control-power{min-width:112px;min-height:50px;border:2px solid #3f4c59;border-radius:8px;background:#fff;color:#1d2733;font:800 15px/1 "Poppins",Arial,sans-serif;cursor:pointer}
+.control-power[aria-pressed="true"]{background:#dfe7ed;color:#1d2733}
 .control-mode{display:grid;gap:5px;text-align:right}.control-mode strong{font-size:23px}.control-mode span{font-size:13px;color:#5a6977}
 .control-jacks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .control-jack{border:2px solid #7e8b97;border-radius:8px;padding:10px 12px;background:#f7f8f9;display:grid;gap:3px;min-height:62px}
