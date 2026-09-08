@@ -33,14 +33,22 @@ jobs:
       - name: Static N1 control audit
         run: node scripts/audit-mission01-control-n1.mjs
 
-      - name: Verify N2-N7 generated outputs unchanged from baseline main
+      - name: Verify N2-N7 generated outputs unchanged from built baseline main
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p test-results/n1-control
           : > test-results/n1-control/n2-n7-hashes.txt
+
+          git worktree add --detach /tmp/apulab-control-baseline origin/main
+          (
+            cd /tmp/apulab-control-baseline
+            npm ci --no-fund --no-audit
+            npm run build
+          )
+
           for level in 2 3 4 5 6 7; do
-            baseline="$(git show origin/main:public/missions/mission01/level${level}.html | sha256sum | awk '{print $1}')"
+            baseline="$(sha256sum /tmp/apulab-control-baseline/public/missions/mission01/level${level}.html | awk '{print $1}')"
             current="$(sha256sum public/missions/mission01/level${level}.html | awk '{print $1}')"
             printf 'level%s baseline=%s current=%s\n' "$level" "$baseline" "$current" | tee -a test-results/n1-control/n2-n7-hashes.txt
             test "$baseline" = "$current"
