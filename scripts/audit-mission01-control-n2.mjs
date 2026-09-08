@@ -55,8 +55,18 @@ for (const token of [
   'Compara nuevamente tus mediciones con el requisito.',
 ]) if (!js.includes(token)) fail(`js_${token}`);
 
-for (const forbidden of ['22–24', '22-24', 'V⎓', 'COM', 'VΩ', 'AYNI', 'Yachay', 'confetti']) {
-  if (js.includes(forbidden)) fail(`forbidden_${forbidden}`);
+// N2 Control must not re-test N1 instrumentation concepts. Match semantic
+// tokens instead of raw substrings so COMPARAR / COMPROBAR do not trigger COM.
+if (/22[–-]24/.test(js)) fail('forbidden_legacy_range');
+if (js.includes('V⎓')) fail('forbidden_vdc_mode');
+if (/(^|[^A-Za-z0-9_])COM([^A-Za-z0-9_]|$)/m.test(js)) fail('forbidden_com_jack');
+if (js.includes('VΩ')) fail('forbidden_vohm_jack');
+for (const [code, forbidden] of [
+  ['ayni', 'AYNI'],
+  ['yachay', 'Yachay'],
+  ['confetti', 'confetti'],
+]) {
+  if (js.includes(forbidden)) fail(`forbidden_${code}`);
 }
 if (!js.includes("CONFIG_URL = '/control/study-config.json'")) fail('shared_config_consumption');
 if (!js.includes('selected === CONFIG.correctBatteryId')) fail('dynamic_correctness');
