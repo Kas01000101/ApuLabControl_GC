@@ -41,7 +41,7 @@ function findForbiddenKeys(value, path = '$', found = []) {
 async function selectProbeToTerminal(frame, probe, terminal) {
   await frame.locator(`#control-${probe}-probe`).click();
   await frame.locator(`#control-terminal-${terminal}`).click();
-  await frame.page().waitForTimeout(120);
+  await new Promise((resolveWait) => setTimeout(resolveWait, 120));
 }
 
 (async () => {
