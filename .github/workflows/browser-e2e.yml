@@ -1,0 +1,206 @@
+name: Mission 01 Browser E2E
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - refactor/mission01-level6-study-flow
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22.16.0'
+          cache: npm
+
+      - name: Install project dependencies
+        run: npm ci --no-fund --no-audit
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify local Three.js runtime is complete
+        run: |
+          test -f public/vendor/three/three.module.js
+          test -f public/vendor/three/three.core.js
+          test -f public/vendor/three/OrbitControls.js
+          grep -Fq "from './three.core.js'" public/vendor/three/three.module.js
+          grep -Fq 'const PRACTICE_BATTERY_VOLTAGE = 15.0;' public/missions/mission01/level1.html
+          ! grep -Fq 'const PRACTICE_BATTERY_VOLTAGE = 28.0;' public/missions/mission01/level1.html
+          grep -Fq '#repeat-palette[hidden]{display:none!important}' public/missions/mission01/level5.html
+
+      - name: Preserve generated Mission 01 runtime
+        uses: actions/upload-artifact@v7
+        with:
+          name: mission01-generated-runtime
+          path: |
+            public/missions/mission01
+            public/vendor/three
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --global playwright@1.55.0 --no-fund --no-audit
+          playwright install --with-deps chromium
+          echo "NODE_PATH=$(npm root -g)" >> "$GITHUB_ENV"
+
+      - name: Start production preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/apulab-preview.log 2>&1 &
+          echo $! > /tmp/apulab-preview.pid
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/apulab-preview.log
+          exit 1
+
+      - name: App shell menu to Mission 01
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/app-shell.cjs
+
+      - name: Browser smoke N1 to N7
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-smoke.cjs
+
+      - name: Verify SFX OFF contract N1 to N7
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-sfx.cjs
+
+      - name: Print preview log on failure
+        if: failure()
+        run: cat /tmp/apulab-preview.log || true
+
+      - name: Upload smoke failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mission01-smoke-failure
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 3
+
+  gameplay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22.16.0'
+          cache: npm
+
+      - name: Install project dependencies
+        run: npm ci --no-fund --no-audit
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --global playwright@1.55.0 --no-fund --no-audit
+          playwright install --with-deps chromium
+          echo "NODE_PATH=$(npm root -g)" >> "$GITHUB_ENV"
+
+      - name: Start production preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/apulab-gameplay-preview.log 2>&1 &
+          echo $! > /tmp/apulab-preview.pid
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/apulab-gameplay-preview.log
+          exit 1
+
+      - name: Level 5 final loops contract
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-level5-final-loops.cjs
+
+      - name: Level 6 physical parity with Level 5
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-level6-n5-parity.cjs
+
+      - name: Level 6 runtime identity and navigation
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-level6-navigation-identity.cjs
+
+      - name: Level 6 interaction and science contract
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-level6-contract.cjs
+
+      - name: Level 6 final communication position
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-level6-final-position.cjs
+
+      - name: Level 7 physical parity with Level 6
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-level7-n6-parity.cjs
+
+      - name: Level 7 instrument-choice contract
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-level7-contract.cjs
+
+      - name: Real electronics N1 to N2
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-electronics.cjs
+
+      - name: Real gameplay N3 to N6
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-gameplay-n3-n6.cjs
+
+      - name: Upload Level 5-7 visual evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mission01-level5-7-visual-evidence
+          path: |
+            test-results/level5-final-loops
+            test-results/level6-n5-parity
+            test-results/level6-contract
+            test-results/level7-n6-parity
+            test-results/level7-contract
+          if-no-files-found: ignore
+          retention-days: 5
+
+      - name: Print gameplay preview log on failure
+        if: failure()
+        run: cat /tmp/apulab-gameplay-preview.log || true
+
+      - name: Upload gameplay failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mission01-gameplay-failure
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 3
