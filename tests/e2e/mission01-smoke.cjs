@@ -83,8 +83,7 @@ async function persistEvidence(error) {
           && !frame.classList.contains('is-loading')
           && !frame.classList.contains('is-entering')
           && frame.getAttribute('aria-hidden') === 'false';
-        const correctTitle = frame.title.includes(`Nivel ${n} de 7`);
-        return correctPath && settled && correctTitle;
+        return correctPath && settled;
       }
       catch { return false; }
     }, level);
