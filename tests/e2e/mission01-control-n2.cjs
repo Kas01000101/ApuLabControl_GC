@@ -43,6 +43,19 @@ async function waitN2(page) {
   return frame;
 }
 
+async function waitMissionFrameVisualStable(page) {
+  await page.waitForFunction(() => {
+    const mission = document.querySelector('iframe.mission01-frame');
+    return Boolean(
+      mission
+      && mission.classList.contains('is-active')
+      && !mission.classList.contains('is-entering')
+      && !mission.classList.contains('is-loading')
+      && mission.getAttribute('aria-hidden') === 'false'
+    );
+  }, null, { timeout: 10_000 });
+}
+
 (async () => {
   await mkdir(OUT, { recursive: true });
   const browser = await chromium.launch({ headless: true });
@@ -58,6 +71,7 @@ async function waitN2(page) {
     await enterMission(page);
     await completeN1(page);
     let frame = await waitN2(page);
+    await waitMissionFrameVisualStable(page);
 
     assert((await frame.locator('#control-n2-range').innerText()).includes('> 24.0 V'), 'N2: lower exclusive limit missing');
     assert((await frame.locator('#control-n2-range').innerText()).includes('< 32.0 V'), 'N2: upper exclusive limit missing');
@@ -102,6 +116,11 @@ async function waitN2(page) {
     assert(state.registered.A === 24 && state.registered.B === 28 && state.registered.C === 32, 'N2 refresh: measurements not restored');
 
     await frame.locator('#control-n2-choice-B').click();
+    state = await frame.locator('body').evaluate(() => window.__apulabControlN2State());
+    assert(state.selectedBatteryId === 'B', 'N2 visual QA: corrected B choice must be selected before submit');
+    assert(state.finalSuccess === false, 'N2 visual QA: pre-submit B choice must not already complete');
+    await page.screenshot({ path: resolve(OUT, 'n2_gc_correct_choice.png'), fullPage: true });
+
     await frame.locator('#control-n2-submit').click();
     await frame.locator('#control-n2-completion').waitFor({ state: 'visible', timeout: 10_000 });
     state = await frame.locator('body').evaluate(() => window.__apulabControlN2State());
@@ -109,7 +128,6 @@ async function waitN2(page) {
     assert(state.responseChangeCount === 1, 'N2: response change count must be one');
     assert(state.finalSuccess === true, 'N2: B must complete');
     assert(state.measurementOrder.join(',') === 'A,B,C', 'N2: measurement order must be preserved');
-    await page.screenshot({ path: resolve(OUT, 'n2_gc_correct_choice.png'), fullPage: true });
     await page.screenshot({ path: resolve(OUT, 'n2_gc_completed.png'), fullPage: true });
 
     await frame.locator('body').evaluate(() => window.location.reload());
@@ -126,7 +144,7 @@ async function waitN2(page) {
     }, null, { timeout: 15_000 });
 
     assert(errors.length === 0, `N2 runtime errors:\n${errors.join('\n')}`);
-    console.log('[e2e] N2 control OK · 24/28/32 · 3/3 · wrong A → correct B · refresh · continue N3');
+    console.log('[e2e] N2 control OK · 24/28/32 · 3/3 · wrong A → correct B · refresh · continue N3 · visual evidence stable');
   } finally {
     await browser.close();
   }
