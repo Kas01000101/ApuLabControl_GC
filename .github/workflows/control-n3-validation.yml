@@ -25,7 +25,6 @@ jobs:
           node scripts/audit-mission01-control-n3.mjs
           node scripts/audit-mission01-control-n3-baseline.mjs
       - name: Frozen N1/N2 generated parity
-        shell: bash
         run: |
           set -euo pipefail
           git worktree add --detach /tmp/n1 b717a70b685f382044276b7a30bec5b556e94e9c
@@ -35,7 +34,6 @@ jobs:
           (cd /tmp/n2 && npm ci --no-fund --no-audit && npm run build)
           test "$(sha256sum /tmp/n2/public/missions/mission01/level2.html|awk '{print $1}')" = "$(sha256sum public/missions/mission01/level2.html|awk '{print $1}')"
       - name: Frozen N4-N7 parity
-        shell: bash
         run: |
           set -euo pipefail
           declare -A e=([4]=195821ccd3d0b67870b0ba1977b09dc1e3c36b8d11ec66f76a5b816782dd3104 [5]=8b0f0740fafd3022870d95291074aeff652e95fe3322671bf110bf138de578e8 [6]=53cfd03663c5604a3878132f2e9313caa638bb413935fa4b730415c647ff9bca [7]=03e125bf9bb41f960039343a652dad358060a271c1c1050b61347f59d4e02eca)
@@ -55,10 +53,16 @@ jobs:
       - name: N3 entry through frozen N1/N2
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: node tests/e2e/mission01-control-n3-entry.cjs
-      - name: N3 full physical + persistence + alternate solution + screenshots + N4 transition
+      - name: N3 persistence correction and evidence
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
-        run: node tests/e2e/mission01-control-n3.cjs
-      - name: N3 telemetry + privacy + idempotency + audio
+        run: node tests/e2e/mission01-control-n3-persistence.cjs
+      - name: N3 alternate valid program
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: node tests/e2e/mission01-control-n3-alternate.cjs
+      - name: N3 to N4 transition
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: node tests/e2e/mission01-control-n3-transition.cjs
+      - name: N3 telemetry privacy idempotency audio
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: node tests/e2e/mission01-control-n3-telemetry.cjs
       - name: App shell
