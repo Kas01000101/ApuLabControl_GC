@@ -28,6 +28,17 @@ function assert(condition, message) {
     assert(await page.locator('.control-jack').count() === 2, 'N1 freeze: COM/VΩ preconfigured display changed');
     assert(await page.locator('.control-jack button, .control-jack input').count() === 0, 'N1 freeze: COM/VΩ became an evaluated interaction');
 
+    for (const selector of ['#control-battery-power', '#control-meter-power']) {
+      const button = page.locator(selector);
+      assert((await button.innerText()).trim() === 'POWER', `N1 freeze: ${selector} label is not POWER`);
+      const style = await button.evaluate((node) => {
+        const computed = getComputedStyle(node);
+        return { color: computed.color, backgroundColor: computed.backgroundColor };
+      });
+      assert(style.color !== style.backgroundColor, `N1 freeze: ${selector} POWER label lacks visible contrast`);
+      assert(style.color === 'rgb(29, 39, 51)', `N1 freeze: ${selector} POWER label color changed: ${style.color}`);
+    }
+
     const text = await control.innerText();
     assert(text.includes('V⎓'), 'N1 freeze: V⎓ mode marker missing');
     assert(text.includes('COM') && text.includes('VΩ'), 'N1 freeze: COM/VΩ labels missing');
@@ -37,7 +48,7 @@ function assert(condition, message) {
     assert(source.includes('PRACTICE_BATTERY_VOLTAGE = 15.0'), 'N1 freeze: scientific 15.0 V source contract changed');
     assert(source.includes('data-apulab-control="n1-initial-answer-guard"'), 'N1 freeze: initial answer guard missing');
 
-    console.log('[e2e] N1 FREEZE CONTRACT OK · neutral initial source · 15.0 V scientific core · V⎓ · COM/VΩ · probes preserved');
+    console.log('[e2e] N1 FREEZE CONTRACT OK · neutral initial source · visible POWER controls · 15.0 V scientific core · V⎓ · COM/VΩ · probes preserved');
   } finally {
     await browser.close();
   }
