@@ -27,7 +27,7 @@ jobs:
       - name: Frozen N1/N2 generated parity
         shell: bash
         run: |
-          set -euo pipefail; mkdir -p test-results/n3-control
+          set -euo pipefail
           git worktree add --detach /tmp/n1 b717a70b685f382044276b7a30bec5b556e94e9c
           (cd /tmp/n1 && npm ci --no-fund --no-audit && npm run build)
           test "$(sha256sum /tmp/n1/public/missions/mission01/level1.html|awk '{print $1}')" = "$(sha256sum public/missions/mission01/level1.html|awk '{print $1}')"
@@ -46,14 +46,19 @@ jobs:
           playwright install --with-deps chromium
           echo "NODE_PATH=$(npm root -g)" >> "$GITHUB_ENV"
       - name: Preview
-        shell: bash
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/preview.log 2>&1 &
           for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done; cat /tmp/preview.log; exit 1
       - name: N1 frozen regression
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: node tests/e2e/mission01-control-n1-freeze.cjs
-      - name: N3 physical + persistence + alternate solution + screenshots
+      - name: N3 entry through frozen N1/N2
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: node tests/e2e/mission01-control-n3-entry.cjs
+      - name: N3 direct core parity + persistence + multiple solutions
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: node tests/e2e/mission01-control-n3-direct.cjs
+      - name: N3 full physical + screenshots + N4 transition
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: node tests/e2e/mission01-control-n3.cjs
       - name: N3 telemetry + privacy + idempotency + audio
