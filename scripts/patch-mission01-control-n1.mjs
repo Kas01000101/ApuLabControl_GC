@@ -59,7 +59,10 @@ html = html.replace(
 
 if (!html.includes('</head>') || !html.includes('</body>')) throw new Error('mission01_control_n1_invalid_html');
 html = html.replace('</head>', '<link rel="stylesheet" href="/control/n1-control.css" data-apulab-control="n1">\n</head>');
-html = html.replace('</body>', '<script src="/control/n1-control.js" data-apulab-control="n1"></script>\n</body>');
+html = html.replace(
+  '</body>',
+  '<script src="/control/n1-control.js" data-apulab-control="n1"></script>\n<script data-apulab-control="n1-initial-answer-guard">document.querySelector(".control-battery-label")?.replaceChildren("Fuente de práctica");</script>\n</body>',
+);
 
 await writeFile(LEVEL1_PATH, html, 'utf8');
-console.info('[mission01] CONTROL N1 V1 · N1-local flat active-control adapter injected');
+console.info('[mission01] CONTROL N1 V1 · N1-local flat active-control adapter injected · initial answer hidden until measurement');
