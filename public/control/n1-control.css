@@ -1,0 +1,53 @@
+/* APULAB_CONTROL_N1_V1 · N1-only active-control presentation. */
+#kawsay-rover-battery .kawsay-stage{background:#eef1f4!important}
+#kawsay-canvas{opacity:0!important;pointer-events:none!important}
+#kawsay-guide-container,#kawsay-hud-container,#kawsay-journal,
+#kawsay-success-overlay,#kawsay-journal-overlay,#kawsay-confetti,
+#apulab-celebration-layer{display:none!important;visibility:hidden!important}
+#apulab-control-n1{position:absolute;inset:0;z-index:3200;box-sizing:border-box;background:#eef1f4;color:#1d2733;font-family:"Poppins",Arial,sans-serif;padding:30px 42px 26px;display:grid;grid-template-rows:auto 1fr auto;gap:20px}
+#apulab-control-n1 *{box-sizing:border-box}
+.control-n1-header{display:flex;align-items:center;justify-content:space-between;gap:24px;border-bottom:2px solid #c8d0d8;padding-bottom:18px}
+.control-n1-heading{display:grid;gap:4px}
+.control-n1-kicker{font-size:15px;font-weight:700;letter-spacing:.08em;color:#556575}
+.control-n1-heading h1{font-size:28px;line-height:1.15;margin:0;font-weight:800;color:#18212b}
+.control-n1-actions{display:flex;gap:12px}
+.control-n1-button{min-width:142px;min-height:48px;border:2px solid #3f4c59;border-radius:8px;background:#fff;color:#1d2733;font:700 16px/1 "Poppins",Arial,sans-serif;padding:12px 18px;cursor:pointer;box-shadow:none;transition:none}
+.control-n1-button:hover{background:#f7f8f9}
+.control-n1-button[aria-pressed="true"]{background:#e4e9ee}
+.control-n1-button:focus-visible,.control-probe:focus-visible,.control-terminal:focus-visible{outline:4px solid #27628f;outline-offset:3px}
+.control-n1-workspace{display:grid;grid-template-columns:1.05fr .95fr;gap:30px;min-height:0}
+.control-panel{background:#fff;border:2px solid #aeb9c4;border-radius:12px;padding:24px;position:relative;min-height:430px}
+.control-panel h2{margin:0 0 18px;font-size:21px;color:#1d2733}
+.control-meter-body{width:390px;max-width:100%;margin:0 auto;border:3px solid #4c5966;border-radius:18px;background:#e4e8eb;padding:24px;display:grid;gap:19px}
+.control-meter-display{height:92px;border:3px solid #3e4d42;border-radius:8px;background:#d9e5d4;display:flex;align-items:center;justify-content:flex-end;padding:0 22px;font:800 39px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#26332b;letter-spacing:.02em}
+.control-meter-display.is-off{background:#9aa49b;color:#3c463e}
+.control-meter-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.control-power{min-width:112px;min-height:50px;border:2px solid #3f4c59;border-radius:8px;background:#fff;font:800 15px/1 "Poppins",Arial,sans-serif;cursor:pointer}
+.control-power[aria-pressed="true"]{background:#dfe7ed}
+.control-mode{display:grid;gap:5px;text-align:right}.control-mode strong{font-size:23px}.control-mode span{font-size:13px;color:#5a6977}
+.control-jacks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.control-jack{border:2px solid #7e8b97;border-radius:8px;padding:10px 12px;background:#f7f8f9;display:grid;gap:3px;min-height:62px}
+.control-jack strong{font-size:16px}.control-jack span{font-size:12px;color:#53616e}
+.control-battery-body{height:270px;border:3px solid #596673;border-radius:20px;background:#e8ecef;padding:22px;display:grid;grid-template-rows:auto 1fr auto;gap:16px}
+.control-battery-label{font-weight:800;font-size:18px}.control-battery-note{font-size:13px;color:#5a6977}
+.control-terminals{display:flex;align-items:center;justify-content:center;gap:80px}
+.control-terminal{width:100px;height:100px;border-radius:50%;border:4px solid #4e5a66;background:#fff;font:900 43px/1 "Poppins",Arial,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative}
+.control-terminal[data-terminal="positive"]{border-color:#9d3d3d;color:#8e2f2f}
+.control-terminal[data-terminal="negative"]{border-color:#303941;color:#303941}
+.control-terminal.is-target::after{content:"Destino seleccionado";position:absolute;top:108px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;font-weight:600;color:#43515e}
+.control-probes{grid-column:1/-1;background:#fff;border:2px solid #aeb9c4;border-radius:12px;padding:16px 20px;display:grid;grid-template-columns:auto 1fr 1fr;gap:18px;align-items:center}
+.control-probes h2{font-size:18px;margin:0 10px 0 0}
+.control-probe{min-height:62px;border:2px solid #737f8a;border-radius:9px;background:#f8f9fa;padding:10px 14px;display:flex;align-items:center;gap:14px;cursor:pointer;text-align:left;color:#1d2733}
+.control-probe.is-selected{border-width:4px;padding:8px 12px;background:#eef3f7}
+.probe-shaft{display:block;width:16px;height:42px;border-radius:7px;flex:0 0 16px}
+.control-probe[data-probe="red"] .probe-shaft{background:#a33636}.control-probe[data-probe="black"] .probe-shaft{background:#252b30}
+.probe-copy{display:grid;gap:2px}.probe-copy strong{font-size:15px}.probe-copy span{font-size:13px;color:#556575}
+.control-n1-footer{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;background:#fff;border:2px solid #aeb9c4;border-radius:10px;padding:15px 18px;min-height:68px}
+.control-feedback{font-size:16px;font-weight:600}.control-feedback small{display:block;font-size:12px;font-weight:500;color:#5b6875;margin-top:4px}
+.control-reading-summary{font-size:14px;color:#4c5966;font-weight:600;white-space:nowrap}
+.control-help-panel{position:absolute;right:42px;top:108px;width:440px;z-index:4;background:#fff;border:2px solid #7e8b97;border-radius:10px;padding:20px;box-shadow:0 10px 30px rgba(33,45,58,.14)}
+.control-help-panel[hidden]{display:none}.control-help-panel h2{font-size:19px;margin:0 0 12px}.control-help-panel p{font-size:15px;line-height:1.55;margin:0 0 10px}.control-help-panel ol{padding-left:22px;margin:0}.control-help-panel li{margin:8px 0;line-height:1.45}
+.control-completion{position:absolute;inset:0;z-index:8;background:rgba(238,241,244,.94);display:flex;align-items:center;justify-content:center;padding:40px}
+.control-completion[hidden]{display:none}.control-completion-card{width:520px;background:#fff;border:3px solid #65727e;border-radius:12px;padding:30px;text-align:left;box-shadow:none}.control-completion-card h2{font-size:26px;margin:0 0 14px}.control-completion-card p{font-size:18px;margin:0 0 22px}.control-completion-card strong{font-size:24px}.control-completion-card .control-n1-button{float:right}
+.control-screenreader-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:900px){#apulab-control-n1{padding:20px;gap:14px}.control-n1-workspace{grid-template-columns:1fr}.control-panel{min-height:auto}.control-probes{grid-column:1;grid-template-columns:1fr}.control-n1-header{align-items:flex-start}.control-help-panel{right:20px;left:20px;width:auto}.control-terminals{gap:42px}}
