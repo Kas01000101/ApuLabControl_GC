@@ -2,8 +2,10 @@ const { chromium } = require('playwright');
 
 const BASE_URL = process.env.APULAB_BASE_URL || 'http://127.0.0.1:4173';
 
+let browser;
+
 (async () => {
-  const browser = await chromium.launch({ headless: true });
+  browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1672, height: 941 } });
 
   // Este contrato valida exclusivamente el runtime de audio. Las fuentes remotas
@@ -34,7 +36,12 @@ const BASE_URL = process.env.APULAB_BASE_URL || 'http://127.0.0.1:4173';
       waitUntil: 'domcontentloaded',
       timeout: 8_000,
     });
-    await page.locator('canvas').first().waitFor({ state: 'visible', timeout: 8_000 });
+
+    // El GC neutraliza visualmente el canvas de N1/N2. Para este contrato de
+    // audio solo necesitamos comprobar que el runtime del nivel cargó y que el
+    // canvas sigue en el DOM; exigir visibilidad convertiría un cambio de
+    // presentación válido en un falso fallo del test de SFX.
+    await page.locator('canvas').first().waitFor({ state: 'attached', timeout: 8_000 });
 
     // Dispara por DOM las rutas de feedback históricas sin esperar estados
     // visuales/overlays que no forman parte del contrato de SFX.
@@ -58,8 +65,10 @@ const BASE_URL = process.env.APULAB_BASE_URL || 'http://127.0.0.1:4173';
   }
 
   await browser.close();
+  browser = null;
   console.log('[e2e] SFX OFF contract OK · N1–N7 do not construct Web Audio contexts from feedback paths');
-})().catch((error) => {
+})().catch(async (error) => {
   console.error(error);
+  try { await browser?.close(); } catch (_) {}
   process.exitCode = 1;
 });
