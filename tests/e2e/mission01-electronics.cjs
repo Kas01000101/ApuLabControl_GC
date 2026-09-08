@@ -70,6 +70,13 @@ async function waitControlReady() {
   await page.waitForFunction(() => !document.querySelector('#control-battery-power')?.disabled, null, { timeout: 15_000 });
 }
 
+async function reloadControlN1() {
+  // The runtime readiness contract is waitControlReady(). Waiting for networkidle
+  // is not semantically relevant and can stall after a fully restored N1 page.
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitControlReady();
+}
+
 async function selectProbeToTerminal(probe, terminal) {
   await page.locator(`#control-${probe}-probe`).click();
   await page.locator(`#control-terminal-${terminal}`).click();
@@ -126,8 +133,7 @@ async function level1() {
   await page.waitForTimeout(220);
   assert(await page.locator('#control-reading').innerText() === '0.0 V', 'L1: powered incomplete measurement should read 0.0 V');
 
-  await page.reload({ waitUntil: 'networkidle' });
-  await waitControlReady();
+  await reloadControlN1();
   assert(await page.locator('#control-battery-power').getAttribute('aria-pressed') === 'true', 'L1 refresh: battery power was lost');
   assert(await page.locator('#control-meter-power').getAttribute('aria-pressed') === 'true', 'L1 refresh: meter power was lost');
   assert(await page.locator('#control-reading').innerText() === '0.0 V', 'L1 refresh: powered reading state was lost');
@@ -137,8 +143,7 @@ async function level1() {
   assert((await page.locator('#control-feedback').innerText()).includes('Falta conectar el segundo punto'), 'L1: one-probe feedback missing');
   await screenshot('n1_gc_one_probe.png');
 
-  await page.reload({ waitUntil: 'networkidle' });
-  await waitControlReady();
+  await reloadControlN1();
   assert((await page.locator('#control-red-status').innerText()).includes('+'), 'L1 refresh: red probe connection was lost');
   assert(!(await page.locator('#control-completion').isVisible()), 'L1 refresh: one probe incorrectly completed');
 
@@ -149,8 +154,7 @@ async function level1() {
   assert((await page.locator('#control-feedback').innerText()).includes('signo negativo'), 'L1: neutral negative-polarity feedback missing');
   await screenshot('n1_gc_negative_polarity.png');
 
-  await page.reload({ waitUntil: 'networkidle' });
-  await waitControlReady();
+  await reloadControlN1();
   assert(await page.locator('#control-reading').innerText() === '-15.0 V', 'L1 refresh: reversed polarity state was lost');
 
   await selectProbeToTerminal('red', 'positive');
@@ -176,8 +180,7 @@ async function level1() {
   assert(beforeRefresh.state.emitted.level_completed === true, 'L1: level_completed idempotency guard missing');
   assert(beforeRefresh.state.polarityCorrected === true, 'L1: polarity correction was not persisted');
 
-  await page.reload({ waitUntil: 'networkidle' });
-  await waitControlReady();
+  await reloadControlN1();
   await page.locator('#control-completion').waitFor({ state: 'visible', timeout: 10_000 });
   const afterRefresh = await page.evaluate(() => ({
     state: JSON.parse(localStorage.getItem('apulab.control.n1.state.v1')),
