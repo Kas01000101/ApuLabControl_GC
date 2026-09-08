@@ -101,3 +101,8 @@ entry.sha256 = hash(html);
 await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 
 console.info('[mission01] Nivel 2 · bloque GUÍA reparado · cola legacy eliminada · panel visible');
+
+// N2-only active-control adapter. It is injected after the cloned N2 task core
+// and before downstream stabilization; participant-facing logic lives in
+// /public/control and N1/N3-N7 remain untouched.
+await import('./patch-mission01-control-n2.mjs');
