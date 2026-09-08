@@ -72,41 +72,43 @@ jobs:
           test "$(git -C /tmp/apulab-source rev-parse HEAD^{tree})" = "$SOURCE_TREE"
           test -z "$(git -C /tmp/apulab-source status --porcelain)"
 
-      - name: Replace destination working tree with exact source snapshot
+      - name: Publish exact snapshot except workflows
         shell: bash
         run: |
           set -euo pipefail
-          rsync -a --delete --exclude='.git/' /tmp/apulab-source/ ./
+          # GitHub's Actions token cannot create/update workflow files. Preserve
+          # this bootstrap workflow temporarily; workflow files are finalized
+          # separately through the destination-only GitHub connection.
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/workflows/' \
+            /tmp/apulab-source/ ./
+
           test ! -e .baseline-init
-          test ! -e .github/workflows/baseline-import.yml
+          test ! -e .clone-bootstrap
 
-      - name: Verify byte-equivalent Git tree
+          # Outside .github/workflows, destination must now be byte-equivalent.
+          rsync -ani --delete \
+            --exclude='.git/' \
+            --exclude='.github/workflows/' \
+            /tmp/apulab-source/ ./ > /tmp/remaining-diff.txt
+          test ! -s /tmp/remaining-diff.txt
+
+      - name: Commit non-workflow baseline
         shell: bash
         run: |
           set -euo pipefail
-          git add -A
-          DEST_TREE="$(git write-tree)"
-          SOURCE_TREE_ACTUAL="$(git -C /tmp/apulab-source rev-parse HEAD^{tree})"
-          echo "SOURCE_TREE=${SOURCE_TREE_ACTUAL}" >> "$GITHUB_STEP_SUMMARY"
-          echo "DEST_TREE=${DEST_TREE}" >> "$GITHUB_STEP_SUMMARY"
-          test "$DEST_TREE" = "$SOURCE_TREE_ACTUAL"
-          test "$DEST_TREE" = "$SOURCE_TREE"
-
-      - name: Commit baseline with source provenance
-        shell: bash
-        run: |
-          set -euo pipefail
+          git add -A -- ':!.github/workflows'
+          git diff --cached --quiet && { echo 'No non-workflow changes to publish'; exit 0; }
           git config user.name 'ApuLab Control Baseline'
           git config user.email 'actions@users.noreply.github.com'
           git commit \
-            -m 'chore(control): import experimental study baseline' \
+            -m 'chore(control): import experimental study baseline content' \
             -m "CONTROL_SOURCE_REPO=${SOURCE_REPO}" \
             -m "CONTROL_SOURCE_COMMIT=${SOURCE_SHA}" \
             -m "CONTROL_SOURCE_TREE=${SOURCE_TREE}"
-          test "$(git rev-parse HEAD^{tree})" = "$SOURCE_TREE"
-          echo "CONTROL_BASELINE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Guard push target and publish baseline
+      - name: Guard push target and publish baseline content
         shell: bash
         run: |
           set -euo pipefail
@@ -138,4 +140,5 @@ jobs:
             echo 'Source pushes: NO'
             echo 'Destination repository: Kas01000101/ApuLabControl_GC'
             echo 'Destination modified: YES'
+            echo 'Workflow finalization: pending destination-only connector step'
           } >> "$GITHUB_STEP_SUMMARY"
