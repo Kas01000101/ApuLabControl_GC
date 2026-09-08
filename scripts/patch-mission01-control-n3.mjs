@@ -33,7 +33,7 @@ html = html.replace(
 );
 html = html.replace(
   '</body>',
-  '<script src="/control/n3-control.js" data-apulab-control="n3"></script>\n</body>',
+  '<script src="/control/n3-control.js" data-apulab-control="n3"></script>\n<script src="/control/n3-navigation-bridge.js" data-apulab-control="n3-nav"></script>\n</body>',
 );
 
 await writeFile(LEVEL3, html, 'utf8');
