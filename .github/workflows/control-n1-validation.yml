@@ -3,7 +3,7 @@ name: Control N1 Validation Gate
 on:
   push:
     branches:
-      - research/control-active
+      - research/control-n1-freeze
 
 permissions:
   contents: read
