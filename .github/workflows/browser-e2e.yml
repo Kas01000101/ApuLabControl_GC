@@ -125,7 +125,7 @@ jobs:
       - name: Start production preview
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/apulab-gameplay-preview.log 2>&1 &
-          echo $! > /tmp/apulab-preview.pid
+          echo $! > /tmp/apulab-gameplay-preview.pid
           for i in {1..30}; do
             if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then exit 0; fi
             sleep 1
