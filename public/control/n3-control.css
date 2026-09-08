@@ -156,7 +156,7 @@ body.apulab-control-n3-active {
 .control-n3-board {
   display: grid;
   grid-template-columns: repeat(8, minmax(34px, 1fr));
-  width: min(66vh, 650px, 100%);
+  width: min(50vh, 650px, 100%);
   aspect-ratio: 1;
   margin: 0 auto;
   border-top: 1px solid #8d96a4;
