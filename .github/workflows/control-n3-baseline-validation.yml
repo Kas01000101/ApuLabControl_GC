@@ -1,0 +1,63 @@
+name: Control N3 Baseline Validation
+
+on:
+  push:
+    branches:
+      - research/control-active
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-n3-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout control branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22.16.0'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-fund --no-audit
+
+      - name: Build current study clone
+        run: npm run build
+
+      - name: Inspect generated N3 geometry without runtime changes
+        run: |
+          node <<'NODE'
+          const { readFileSync } = require('node:fs');
+          const html = readFileSync('public/missions/mission01/level3.html','utf8');
+          const needles = [
+            'roverState', 'goal', 'target', 'GRID', 'grid', 'ROWS', 'COLS',
+            'obstacle', 'blocked', 'cellToWorld', 'forward', 'left', 'right',
+            'runProgram', 'executeProgram', 'executeCommand', 'resetRover'
+          ];
+          const printed = new Set();
+          for (const needle of needles) {
+            let from = 0;
+            let count = 0;
+            while (count < 5) {
+              const index = html.indexOf(needle, from);
+              if (index < 0) break;
+              const start = Math.max(0, index - 320);
+              const end = Math.min(html.length, index + needle.length + 520);
+              const snippet = html.slice(start,end).replace(/\s+/g,' ');
+              const key = snippet.slice(0,180);
+              if (!printed.has(key)) {
+                printed.add(key);
+                console.log(`\n=== ${needle} @ ${index} ===\n${snippet}\n`);
+                count += 1;
+              }
+              from = index + needle.length;
+            }
+          }
+          console.log(`N3_BYTES=${Buffer.byteLength(html,'utf8')}`);
+          NODE
