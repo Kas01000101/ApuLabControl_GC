@@ -30,27 +30,29 @@ jobs:
       - name: Build current study clone
         run: npm run build
 
-      - name: Inspect generated N3 geometry without runtime changes
+      - name: Inspect generated N3 geometry and constraints without runtime changes
         run: |
           node <<'NODE'
           const { readFileSync } = require('node:fs');
           const html = readFileSync('public/missions/mission01/level3.html','utf8');
           const needles = [
-            'roverState', 'goal', 'target', 'GRID', 'grid', 'ROWS', 'COLS',
-            'obstacle', 'blocked', 'cellToWorld', 'forward', 'left', 'right',
-            'runProgram', 'executeProgram', 'executeCommand', 'resetRover'
+            'const start=', 'const goal=', 'const commands=', 'function renderProgram',
+            'program.length', 'program.push', 'program.splice', 'program=',
+            'executeCommand', 'runProgram', 'completeLevel', 'goal.c',
+            'for(let r=0;r<8', 'for(let c=0;c<8', 'tiles[nr][nc]',
+            'obstacle', 'blocked', 'MAX', 'limit', 'slot'
           ];
           const printed = new Set();
           for (const needle of needles) {
             let from = 0;
             let count = 0;
-            while (count < 5) {
+            while (count < 8) {
               const index = html.indexOf(needle, from);
               if (index < 0) break;
-              const start = Math.max(0, index - 320);
-              const end = Math.min(html.length, index + needle.length + 520);
+              const start = Math.max(0, index - 520);
+              const end = Math.min(html.length, index + needle.length + 900);
               const snippet = html.slice(start,end).replace(/\s+/g,' ');
-              const key = snippet.slice(0,180);
+              const key = snippet.slice(0,220);
               if (!printed.has(key)) {
                 printed.add(key);
                 console.log(`\n=== ${needle} @ ${index} ===\n${snippet}\n`);
