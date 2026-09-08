@@ -92,7 +92,7 @@ body.apulab-control-n3-active {
   grid-template-columns: minmax(0, 1fr) minmax(310px, 360px);
   gap: 14px;
   width: min(1320px, 100%);
-  min-height: 0;
+  flex: 0 0 auto;
   margin: 0 auto;
 }
 
