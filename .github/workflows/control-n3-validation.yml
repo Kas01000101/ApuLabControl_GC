@@ -55,10 +55,7 @@ jobs:
       - name: N3 entry through frozen N1/N2
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: node tests/e2e/mission01-control-n3-entry.cjs
-      - name: N3 direct core parity + persistence + multiple solutions
-        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
-        run: node tests/e2e/mission01-control-n3-direct.cjs
-      - name: N3 full physical + screenshots + N4 transition
+      - name: N3 full physical + persistence + alternate solution + screenshots + N4 transition
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: node tests/e2e/mission01-control-n3.cjs
       - name: N3 telemetry + privacy + idempotency + audio
@@ -86,7 +83,7 @@ jobs:
         with:
           name: control-n3-validation-evidence
           path: test-results/n3-control
-          if-no-files-found: ignore
+          if-no-files-found: error
           retention-days: 7
       - name: Preview log on failure
         if: failure()
