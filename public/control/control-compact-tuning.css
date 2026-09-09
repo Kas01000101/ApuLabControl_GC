@@ -1,0 +1,15 @@
+/* APULAB_CONTROL_COMPACT_TUNING_V1
+   Fine-tuning layer after the shared N2–N7 compact system.
+   Visual-only; no task, telemetry, persistence, or completion semantics. */
+
+@media (min-width: 1200px) and (min-height: 850px) {
+  html[data-apulab-compact="true"] #apulab-control-n5 #n5-feedback {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 34px !important;
+    max-height: 54px;
+    box-sizing: border-box;
+    padding: 7px 10px !important;
+    overflow: hidden;
+  }
+}
