@@ -33,6 +33,21 @@ jobs:
           git worktree add --detach /tmp/n2 dbb60df8f509aa0fe461db015445b28d0e78b5cc
           (cd /tmp/n2 && npm ci --no-fund --no-audit && npm run build)
           test "$(sha256sum /tmp/n2/public/missions/mission01/level2.html|awk '{print $1}')" = "$(sha256sum public/missions/mission01/level2.html|awk '{print $1}')"
+      - name: Frozen N3 exact regression
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n3 a150e2039a5f35c6dabb6bb8cb6eed8ca6d9532e
+          (cd /tmp/n3 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n3/public/missions/mission01/level3.html public/missions/mission01/level3.html
+          for f in \
+            public/control/n3-control.js \
+            public/control/n3-control.css \
+            public/control/n3-navigation-bridge.js \
+            scripts/patch-mission01-control-n3.mjs \
+            scripts/audit-mission01-control-n3.mjs \
+            src/systems/Level3ControlTelemetryBridge.ts; do
+            cmp "/tmp/n3/$f" "$f"
+          done
       - name: Frozen N4-N7 parity
         run: |
           set -euo pipefail
