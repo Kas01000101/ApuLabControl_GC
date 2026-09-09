@@ -203,15 +203,22 @@ async function buildRepeatReference() {
   assert(callbackResult === false, 'N6 repeated completion callback must be guarded');
   tel = await telemetry();
   assert(tel.filter(x => x.event === 'level_completed').length === terminalBefore, 'N6 repeated callback duplicated terminal telemetry');
+
+  // Prove the control postMessage stream on the document that actually emitted it.
+  const postedBeforeReload = await page.evaluate(() => [...(window.__n6ControlMessages || [])]);
+  assert(postedBeforeReload.length > 0, 'N6 control telemetry postMessage stream missing before reload');
+  const postedSerialized = JSON.stringify(postedBeforeReload).toLowerCase();
+  for (const banned of ['credential','password','token','email','school','teacher','full_name','phone','fingerprint','browser','device']) assert(!postedSerialized.includes(banned), `N6 postMessage telemetry contains banned identity field ${banned}`);
+
+  // Persistence/idempotency G is a separate property from page-local message-buffer lifetime.
   await page.reload({ waitUntil: 'networkidle' }); await page.waitForFunction(() => !!window.apulabControlN6QA);
   s = await state(); assert(s.completed && await page.locator('#n6-complete').isVisible(), 'N6 refresh G did not restore completed UI');
   tel = await telemetry(); assert(tel.filter(x => x.event === 'level_completed').length === 1, 'N6 refresh duplicated terminal telemetry');
   assert(tel.filter(x => x.event === 'level_started').length === 1, 'N6 refresh duplicated level_started');
 
-  // Telemetry message privacy before navigation resets the page-level capture buffer.
-  let posted = await page.evaluate(() => window.__n6ControlMessages || []);
-  assert(posted.length > 0, 'N6 control telemetry postMessage stream missing');
-  assert(!JSON.stringify(posted).toLowerCase().includes('credential'), 'N6 postMessage telemetry leaked credential field');
+  // Use the pre-reload Node-side copy for assertions about telemetry emitted before reload.
+  const posted = postedBeforeReload;
+  assert(posted.length > 0, 'N6 pre-reload control telemetry capture unexpectedly empty');
 
   // Re-enter same lifecycle must not duplicate initialization.
   await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
