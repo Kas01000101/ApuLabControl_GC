@@ -1,0 +1,67 @@
+name: Control Study Frozen Exact Regression
+on:
+  push:
+    branches: [research/control-active]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-exact-n1-n7:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v5
+        with: { node-version: '22.16.0', cache: npm }
+      - name: Install
+        run: npm ci --no-fund --no-audit
+      - name: Build active Study Build
+        run: npm run build
+      - name: N1 exact frozen
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n1 b717a70b685f382044276b7a30bec5b556e94e9c
+          (cd /tmp/n1 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n1/public/missions/mission01/level1.html public/missions/mission01/level1.html
+      - name: N2 exact frozen
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n2 dbb60df8f509aa0fe461db015445b28d0e78b5cc
+          (cd /tmp/n2 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n2/public/missions/mission01/level2.html public/missions/mission01/level2.html
+      - name: N3 exact frozen
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n3 a150e2039a5f35c6dabb6bb8cb6eed8ca6d9532e
+          (cd /tmp/n3 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n3/public/missions/mission01/level3.html public/missions/mission01/level3.html
+          for f in public/control/n3-control.js public/control/n3-control.css public/control/n3-navigation-bridge.js scripts/patch-mission01-control-n3.mjs scripts/audit-mission01-control-n3.mjs src/systems/Level3ControlTelemetryBridge.ts; do cmp "/tmp/n3/$f" "$f"; done
+      - name: N4 exact frozen
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n4 b9178428d31e4b608457b3c7af103d723da92781
+          (cd /tmp/n4 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n4/public/missions/mission01/level4.html public/missions/mission01/level4.html
+          for f in public/control/n4-control.js public/control/n4-control.css scripts/patch-mission01-control-n4.mjs scripts/audit-mission01-control-n4.mjs src/systems/Level4ControlTelemetryBridge.ts; do cmp "/tmp/n4/$f" "$f"; done
+      - name: N5 exact frozen
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n5 ef2da8c90773f3c3b79c4e7a0f1576a801bd3283
+          (cd /tmp/n5 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n5/public/missions/mission01/level5.html public/missions/mission01/level5.html
+          for f in public/control/n5-control.js public/control/n5-control.css scripts/patch-mission01-control-n5.mjs scripts/audit-mission01-control-n5.mjs tests/e2e/mission01-control-n5.cjs; do cmp "/tmp/n5/$f" "$f"; done
+      - name: N6 exact frozen
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n6 6fc3288fbb533e1ed841e31748d3bb44c50daa65
+          (cd /tmp/n6 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n6/public/missions/mission01/level6.html public/missions/mission01/level6.html
+          for f in public/control/n6-control.js public/control/n6-control.css scripts/patch-mission01-control-n6.mjs scripts/audit-mission01-control-n6.mjs src/systems/Level6TelemetryBridge.ts tests/e2e/mission01-control-n6.cjs; do cmp "/tmp/n6/$f" "$f"; done
+      - name: N7 exact frozen
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n7 09bfc0479a5f55d8d7476c5d23f37d9760f4cb02
+          (cd /tmp/n7 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n7/public/missions/mission01/level7.html public/missions/mission01/level7.html
+          for f in public/control/n7-control.js public/control/n7-control.css scripts/patch-mission01-control-n7.mjs scripts/audit-mission01-control-n7.mjs src/systems/Level7TelemetryBridge.ts tests/e2e/mission01-control-n7.cjs; do cmp "/tmp/n7/$f" "$f"; done
