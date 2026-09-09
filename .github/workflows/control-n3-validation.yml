@@ -53,6 +53,20 @@ jobs:
           set -euo pipefail
           declare -A e=([4]=195821ccd3d0b67870b0ba1977b09dc1e3c36b8d11ec66f76a5b816782dd3104 [5]=8b0f0740fafd3022870d95291074aeff652e95fe3322671bf110bf138de578e8 [6]=53cfd03663c5604a3878132f2e9313caa638bb413935fa4b730415c647ff9bca [7]=03e125bf9bb41f960039343a652dad358060a271c1c1050b61347f59d4e02eca)
           for n in 4 5 6 7; do test "${e[$n]}" = "$(sha256sum public/missions/mission01/level${n}.html|awk '{print $1}')"; done
+      - name: N4 audit-only source snapshot
+        run: |
+          set -euo pipefail
+          mkdir -p test-results/n4-audit
+          cp public/missions/mission01/level4.html test-results/n4-audit/level4.html
+          cp public/missions/mission01/manifest.json test-results/n4-audit/manifest.json
+          sha256sum public/missions/mission01/level4.html > test-results/n4-audit/sha256.txt
+      - name: Upload N4 audit-only source
+        uses: actions/upload-artifact@v7
+        with:
+          name: control-n4-audit-source
+          path: test-results/n4-audit
+          if-no-files-found: error
+          retention-days: 7
       - name: Playwright Chromium
         run: |
           npm install --global playwright@1.55.0 --no-fund --no-audit
