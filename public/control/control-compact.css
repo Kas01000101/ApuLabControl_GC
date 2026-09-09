@@ -1,0 +1,366 @@
+/* APULAB_CONTROL_COMPACT_VIEWPORT_V1
+   Shared visual-density overlay for GC N2–N7 only.
+   No task, telemetry, persistence, success, or scientific semantics live here. */
+
+html[data-apulab-compact="true"] {
+  --control-gap-xl: 20px;
+  --control-gap-lg: 16px;
+  --control-gap-md: 12px;
+  --control-gap-sm: 8px;
+  --control-panel-padding: 16px;
+  --control-panel-radius: 12px;
+  --control-button-height: 44px;
+  --control-button-height-small: 38px;
+  --control-section-title-size: 16px;
+  --control-section-subtitle-size: 14px;
+}
+
+@media (min-width: 1200px) and (min-height: 850px) {
+  /* N2 · COMPARAR */
+  html[data-apulab-compact="true"] #apulab-control-n2 {
+    padding: 16px 24px 18px !important;
+    overflow: hidden !important;
+  }
+  html[data-apulab-compact="true"] .control-n2-header {
+    max-width: 1520px;
+    margin-bottom: 12px;
+    gap: 16px;
+    padding-bottom: 10px;
+  }
+  html[data-apulab-compact="true"] .control-n2-header h1 {
+    font-size: clamp(24px, 1.75vw, 30px);
+  }
+  html[data-apulab-compact="true"] .control-n2-header p { margin-top: 5px; }
+  html[data-apulab-compact="true"] .control-n2-main {
+    max-width: 1520px;
+    grid-template-columns: minmax(0, 1.55fr) minmax(320px, .85fr);
+    gap: 14px;
+  }
+  html[data-apulab-compact="true"] .control-n2-observation { padding: 16px; }
+  html[data-apulab-compact="true"] .control-n2-section-heading {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  html[data-apulab-compact="true"] .control-n2-section-heading h2 { font-size: 18px; }
+  html[data-apulab-compact="true"] .control-n2-tabs {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  html[data-apulab-compact="true"] .control-n2-tab,
+  html[data-apulab-compact="true"] .control-n2-choice,
+  html[data-apulab-compact="true"] .control-n2-button {
+    min-height: var(--control-button-height);
+  }
+  html[data-apulab-compact="true"] .control-n2-measurement-card {
+    min-height: 216px;
+    grid-template-columns: minmax(190px, .8fr) minmax(220px, 1fr);
+    gap: 14px;
+    padding: 16px;
+  }
+  html[data-apulab-compact="true"] .control-n2-battery-visual {
+    min-height: 132px;
+    grid-template-columns: 36px 1fr 36px;
+    padding: 12px;
+  }
+  html[data-apulab-compact="true"] .control-n2-battery-visual strong { font-size: 48px; }
+  html[data-apulab-compact="true"] .control-n2-terminal {
+    width: 34px;
+    height: 34px;
+    font-size: 20px;
+  }
+  html[data-apulab-compact="true"] .control-n2-reading-block > strong {
+    min-width: 168px;
+    padding: 10px 16px;
+    font-size: 32px;
+  }
+  html[data-apulab-compact="true"] .control-n2-analysis { gap: 12px; }
+  html[data-apulab-compact="true"] .control-n2-panel { padding: 14px 16px; }
+  html[data-apulab-compact="true"] .control-n2-record { padding: 8px 0; }
+  html[data-apulab-compact="true"] .control-n2-panel.requirement strong {
+    margin-top: 8px;
+    font-size: 20px;
+  }
+  html[data-apulab-compact="true"] .control-n2-panel.requirement p { margin-top: 5px; }
+  html[data-apulab-compact="true"] .control-n2-decision {
+    max-width: 1520px;
+    margin-top: 12px;
+    padding: 14px 16px;
+  }
+  html[data-apulab-compact="true"] .control-n2-choices {
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  html[data-apulab-compact="true"] .control-n2-choice {
+    min-height: 44px;
+    font-size: 18px;
+  }
+  html[data-apulab-compact="true"] .control-n2-feedback {
+    min-height: 22px;
+    margin-top: 7px;
+  }
+
+  /* N3 · SECUENCIAR */
+  html[data-apulab-compact="true"] #apulab-control-n3 {
+    gap: 10px;
+    padding: 14px 20px;
+    overflow: hidden;
+  }
+  html[data-apulab-compact="true"] .control-n3-header {
+    width: min(1440px, 100%);
+    gap: 16px;
+    padding: 12px 16px;
+  }
+  html[data-apulab-compact="true"] .control-n3-header h1 { font-size: clamp(20px, 1.7vw, 27px); }
+  html[data-apulab-compact="true"] .control-n3-main {
+    width: min(1440px, 100%);
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 360px);
+    gap: 10px;
+  }
+  html[data-apulab-compact="true"] .control-n3-board-panel,
+  html[data-apulab-compact="true"] .control-n3-sequence-panel { padding: 12px; }
+  html[data-apulab-compact="true"] .control-n3-section-heading {
+    min-height: 38px;
+    margin-bottom: 8px;
+  }
+  html[data-apulab-compact="true"] .control-n3-section-heading h2 { font-size: 18px; }
+  html[data-apulab-compact="true"] .control-n3-board { width: min(44vh, 500px, 100%); }
+  html[data-apulab-compact="true"] .control-n3-board-note { margin-top: 6px; }
+  html[data-apulab-compact="true"] .control-n3-program {
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+  html[data-apulab-compact="true"] .control-n3-program-item { min-height: 36px; }
+  html[data-apulab-compact="true"] .control-n3-controls {
+    width: min(1440px, 100%);
+    gap: 12px;
+    padding: 9px 12px;
+  }
+  html[data-apulab-compact="true"] .control-n3-button,
+  html[data-apulab-compact="true"] .control-n3-command {
+    min-height: 40px;
+    padding: 8px 14px;
+  }
+  html[data-apulab-compact="true"] .control-n3-feedback {
+    width: min(1440px, 100%);
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+
+  /* N4 · PLANIFICAR Y CORREGIR */
+  html[data-apulab-compact="true"] #apulab-control-n4 {
+    gap: 8px;
+    padding: 14px 20px;
+  }
+  html[data-apulab-compact="true"] .control-n4-header {
+    gap: 16px;
+    padding-bottom: 8px;
+  }
+  html[data-apulab-compact="true"] .control-n4-header h1 { font-size: clamp(21px, 1.7vw, 28px); }
+  html[data-apulab-compact="true"] .control-n4-main {
+    grid-template-columns: minmax(500px, 1.15fr) minmax(360px, .85fr);
+    gap: 12px;
+  }
+  html[data-apulab-compact="true"] .control-n4-board-panel,
+  html[data-apulab-compact="true"] .control-n4-sequence-panel {
+    padding: 10px 12px;
+    gap: 7px;
+  }
+  html[data-apulab-compact="true"] .control-n4-section-heading h2 { font-size: 17px; }
+  html[data-apulab-compact="true"] .control-n4-board { width: min(44vh, 500px, 100%); }
+  html[data-apulab-compact="true"] .control-n4-program-item {
+    min-height: 34px;
+    margin-bottom: 4px;
+    padding: 5px 7px;
+  }
+  html[data-apulab-compact="true"] .control-n4-controls {
+    gap: 12px;
+    padding: 8px 10px;
+  }
+  html[data-apulab-compact="true"] .control-n4-command,
+  html[data-apulab-compact="true"] .control-n4-button {
+    min-height: 38px;
+    padding: 8px 12px;
+  }
+  html[data-apulab-compact="true"] .control-n4-feedback {
+    min-height: 34px;
+    padding: 7px 10px;
+  }
+
+  /* N5 · SIMPLIFICAR · BUCLES */
+  html[data-apulab-compact="true"] #apulab-control-n5 {
+    gap: 10px;
+    padding: 14px 20px;
+  }
+  html[data-apulab-compact="true"] .n5-head {
+    gap: 16px;
+    padding-bottom: 8px;
+  }
+  html[data-apulab-compact="true"] .n5-head h1 { font-size: 22px; }
+  html[data-apulab-compact="true"] .n5-main {
+    grid-template-columns: minmax(0, 1.35fr) minmax(350px, .85fr);
+    gap: 12px;
+  }
+  html[data-apulab-compact="true"] #apulab-control-n5 .panel { padding: 10px 12px; }
+  html[data-apulab-compact="true"] #apulab-control-n5 .panel-title { height: 24px; }
+  html[data-apulab-compact="true"] #apulab-control-n5 .board {
+    width: min(50vh, 470px);
+    height: min(50vh, 470px);
+  }
+  html[data-apulab-compact="true"] #apulab-control-n5 .pattern {
+    margin-top: 6px;
+    padding: 6px 9px;
+  }
+  html[data-apulab-compact="true"] #apulab-control-n5 .program { margin: 5px 0; }
+  html[data-apulab-compact="true"] #apulab-control-n5 .row { padding: 6px 8px; }
+  html[data-apulab-compact="true"] #apulab-control-n5 .controls { padding: 8px 10px; }
+  html[data-apulab-compact="true"] #apulab-control-n5 .cmd,
+  html[data-apulab-compact="true"] #apulab-control-n5 .btn {
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+  html[data-apulab-compact="true"] #apulab-control-n5 .comparison { padding: 6px 10px; }
+  html[data-apulab-compact="true"] #apulab-control-n5 .feedback {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* N6 · INVESTIGAR */
+  html[data-apulab-compact="true"] body.apulab-control-n6-active { overflow: hidden !important; }
+  html[data-apulab-compact="true"] #apulab-control-n6 {
+    height: 100vh;
+    min-height: 0;
+    gap: 8px !important;
+    padding: 12px 18px 14px;
+    overflow: hidden;
+  }
+  html[data-apulab-compact="true"] .n6-head {
+    min-height: 74px;
+    gap: 14px;
+    padding: 10px 14px;
+  }
+  html[data-apulab-compact="true"] .n6-head h1 { font-size: 22px; }
+  html[data-apulab-compact="true"] .n6-head p { font-size: 12px; }
+  html[data-apulab-compact="true"] .n6-main {
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1.35fr) minmax(350px, .85fr);
+    gap: 10px;
+  }
+  html[data-apulab-compact="true"] #apulab-control-n6 .panel-title {
+    height: 38px;
+    padding: 0 12px;
+  }
+  html[data-apulab-compact="true"] .n6-board {
+    min-height: 0;
+    padding: 8px;
+  }
+  html[data-apulab-compact="true"] .n6-legend {
+    min-height: 30px;
+    padding: 5px 10px;
+  }
+  html[data-apulab-compact="true"] .n6-program {
+    min-height: 0;
+    max-height: none;
+    padding: 6px;
+  }
+  html[data-apulab-compact="true"] .n6-row {
+    margin: 4px 0;
+    padding: 6px;
+  }
+  html[data-apulab-compact="true"] .n6-controls {
+    gap: 8px;
+    padding: 8px;
+  }
+  html[data-apulab-compact="true"] .n6-cmd,
+  html[data-apulab-compact="true"] .n6-btn {
+    min-height: 40px;
+    padding: 8px 10px;
+  }
+  html[data-apulab-compact="true"] .n6-feedback {
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+
+  /* N7 · LA MUESTRA DESCONOCIDA */
+  html[data-apulab-compact="true"] body.apulab-control-n7-active { overflow: hidden !important; }
+  html[data-apulab-compact="true"] #apulab-control-n7 {
+    height: 100vh;
+    min-height: 0;
+    gap: 8px !important;
+    padding: 12px 18px 14px;
+    overflow: hidden;
+  }
+  html[data-apulab-compact="true"] .n7-head {
+    min-height: 74px;
+    gap: 14px;
+    padding: 10px 14px;
+  }
+  html[data-apulab-compact="true"] .n7-head h1 { font-size: 22px; }
+  html[data-apulab-compact="true"] .n7-head p { font-size: 12px; }
+  html[data-apulab-compact="true"] .n7-main {
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1.35fr) minmax(360px, .85fr);
+    gap: 10px;
+  }
+  html[data-apulab-compact="true"] #apulab-control-n7 .panel-title {
+    height: 38px;
+    padding: 0 12px;
+  }
+  html[data-apulab-compact="true"] .n7-board {
+    min-height: 0;
+    padding: 8px;
+  }
+  html[data-apulab-compact="true"] .n7-legend {
+    min-height: 30px;
+    padding: 5px 10px;
+  }
+  html[data-apulab-compact="true"] .n7-program {
+    min-height: 0;
+    max-height: none;
+    padding: 6px;
+  }
+  html[data-apulab-compact="true"] .n7-row {
+    margin: 4px 0;
+    padding: 6px;
+  }
+  html[data-apulab-compact="true"] .n7-controls {
+    gap: 8px;
+    padding: 8px;
+  }
+  html[data-apulab-compact="true"] .n7-cmd,
+  html[data-apulab-compact="true"] .n7-btn {
+    min-height: 40px;
+    padding: 8px 10px;
+  }
+  html[data-apulab-compact="true"] .n7-feedback {
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+  html[data-apulab-compact="true"] .n7-help > div,
+  html[data-apulab-compact="true"] .n7-modal > .card,
+  html[data-apulab-compact="true"] .n7-complete > .card { padding: 16px; }
+  html[data-apulab-compact="true"] .instrument-grid {
+    gap: 8px;
+    margin-top: 12px;
+  }
+  html[data-apulab-compact="true"] .instrument-grid button {
+    min-height: 110px;
+    padding: 12px;
+  }
+  html[data-apulab-compact="true"] .result-card #n7-result-reading {
+    margin: 9px 0;
+    padding: 10px 12px;
+    font-size: 19px;
+  }
+  html[data-apulab-compact="true"] .result-actions { margin-top: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-apulab-compact="true"] * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

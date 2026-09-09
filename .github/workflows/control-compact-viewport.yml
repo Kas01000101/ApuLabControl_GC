@@ -1,0 +1,45 @@
+name: GC Compact Viewport QA
+on:
+  push:
+    branches: [research/control-active]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compact-viewport:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: '22.16.0', cache: npm }
+      - name: Install
+        run: npm ci --no-fund --no-audit
+      - name: Build
+        run: npm run build
+      - name: Playwright Chromium
+        run: |
+          npm install --global playwright@1.55.0 --no-fund --no-audit
+          playwright install --with-deps chromium
+          echo "NODE_PATH=$(npm root -g)" >> "$GITHUB_ENV"
+      - name: Preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/control-compact-preview.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/control-compact-preview.log
+          exit 1
+      - name: Compact Viewport N2-N7
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-control-compact-viewport.cjs
+      - name: Upload compact viewport evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: control-compact-viewport-evidence
+          path: test-results/control-compact-viewport
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Preview log on failure
+        if: failure()
+        run: cat /tmp/control-compact-preview.log || true
