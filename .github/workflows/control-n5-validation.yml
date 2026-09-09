@@ -1,0 +1,103 @@
+name: Control N5 Validation Gate
+on:
+  push:
+    branches: [research/control-active]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-control-n5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v5
+        with: { node-version: '22.16.0', cache: npm }
+      - name: Install
+        run: npm ci --no-fund --no-audit
+      - name: Build
+        run: npm run build
+      - name: Static N1-N5 contracts
+        run: |
+          node scripts/audit-mission01-control-n1.mjs
+          node scripts/audit-mission01-control-n2.mjs
+          node scripts/audit-mission01-control-n3.mjs
+          node scripts/audit-mission01-control-n3-baseline.mjs
+          node scripts/audit-mission01-control-n4.mjs
+          node scripts/audit-mission01-control-n5.mjs
+      - name: Frozen N1/N2 parity
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n1 b717a70b685f382044276b7a30bec5b556e94e9c
+          (cd /tmp/n1 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n1/public/missions/mission01/level1.html public/missions/mission01/level1.html
+          git worktree add --detach /tmp/n2 dbb60df8f509aa0fe461db015445b28d0e78b5cc
+          (cd /tmp/n2 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n2/public/missions/mission01/level2.html public/missions/mission01/level2.html
+      - name: Frozen N3 exact regression
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n3 a150e2039a5f35c6dabb6bb8cb6eed8ca6d9532e
+          (cd /tmp/n3 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n3/public/missions/mission01/level3.html public/missions/mission01/level3.html
+          for f in public/control/n3-control.js public/control/n3-control.css public/control/n3-navigation-bridge.js scripts/patch-mission01-control-n3.mjs scripts/audit-mission01-control-n3.mjs src/systems/Level3ControlTelemetryBridge.ts; do cmp "/tmp/n3/$f" "$f"; done
+      - name: Frozen N4 exact regression
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n4 b9178428d31e4b608457b3c7af103d723da92781
+          (cd /tmp/n4 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n4/public/missions/mission01/level4.html public/missions/mission01/level4.html
+          for f in public/control/n4-control.js public/control/n4-control.css scripts/patch-mission01-control-n4.mjs scripts/audit-mission01-control-n4.mjs src/systems/Level4ControlTelemetryBridge.ts; do cmp "/tmp/n4/$f" "$f"; done
+      - name: N6/N7 generated parity
+        run: |
+          set -euo pipefail
+          test "53cfd03663c5604a3878132f2e9313caa638bb413935fa4b730415c647ff9bca" = "$(sha256sum public/missions/mission01/level6.html|awk '{print $1}')"
+          test "03e125bf9bb41f960039343a652dad358060a271c1c1050b61347f59d4e02eca" = "$(sha256sum public/missions/mission01/level7.html|awk '{print $1}')"
+      - name: Playwright Chromium
+        run: |
+          npm install --global playwright@1.55.0 --no-fund --no-audit
+          playwright install --with-deps chromium
+          echo "NODE_PATH=$(npm root -g)" >> "$GITHUB_ENV"
+      - name: Preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/preview.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done; cat /tmp/preview.log; exit 1
+      - name: N1 frozen physical regression
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: node tests/e2e/mission01-control-n1-freeze.cjs
+      - name: N3 frozen physical regression
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: |
+          node tests/e2e/mission01-control-n3-persistence.cjs
+          node tests/e2e/mission01-control-n3-alternate.cjs
+          node tests/e2e/mission01-control-n3-telemetry.cjs
+      - name: N4 frozen physical regression
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: |
+          node tests/e2e/mission01-control-n4.cjs
+          node tests/e2e/mission01-control-n4-alternate.cjs
+          node tests/e2e/mission01-control-n4-telemetry.cjs
+          node tests/e2e/mission01-control-n4-transition.cjs
+      - name: N5 two-phase physical persistence telemetry privacy idempotency N5-to-N6
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: node tests/e2e/mission01-control-n5.cjs
+      - name: N6/N7 downstream regressions
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: |
+          node tests/e2e/mission01-level6-navigation-identity.cjs
+          node tests/e2e/mission01-level6-contract.cjs
+          node tests/e2e/mission01-level6-final-position.cjs
+          node tests/e2e/mission01-level7-n6-parity.cjs
+          node tests/e2e/mission01-level7-contract.cjs
+      - name: Upload N5 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: control-n5-validation-evidence
+          path: test-results/n5-control
+          if-no-files-found: error
+          retention-days: 7
+      - name: Preview log on failure
+        if: failure()
+        run: cat /tmp/preview.log || true
