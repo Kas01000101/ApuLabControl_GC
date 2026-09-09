@@ -9,10 +9,11 @@ import { installFailureAlarmFx } from './three/effects/FailureAlarmFx';
 import { installLevel1ControlTelemetryBridge } from './systems/Level1ControlTelemetryBridge';
 import { installLevel2ControlTelemetryBridge } from './systems/Level2ControlTelemetryBridge';
 import { installLevel3ControlTelemetryBridge } from './systems/Level3ControlTelemetryBridge';
+import { installLevel4ControlTelemetryBridge } from './systems/Level4ControlTelemetryBridge';
 import { installLevel6TelemetryBridge } from './systems/Level6TelemetryBridge';
 import { installLevel7TelemetryBridge } from './systems/Level7TelemetryBridge';
 
-const BUILD_ID = '2026.09.08-control-n3-active';
+const BUILD_ID = '2026.09.09-control-n4-active';
 document.documentElement.dataset.apulabBuild = BUILD_ID;
 console.info(`[ApuLabStationGame] build ${BUILD_ID}`);
 
@@ -23,6 +24,7 @@ installFailureAlarmFx(uiRoot);
 installLevel1ControlTelemetryBridge();
 installLevel2ControlTelemetryBridge();
 installLevel3ControlTelemetryBridge();
+installLevel4ControlTelemetryBridge();
 installLevel6TelemetryBridge();
 installLevel7TelemetryBridge();
 new ApuLabApp({threeRoot,uiRoot}).start();

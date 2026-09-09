@@ -8,39 +8,30 @@
       { "id": "B", "voltage": 28.0 },
       { "id": "C", "voltage": 32.0 }
     ],
-    "requiredVoltage": {
-      "minExclusive": 24.0,
-      "maxExclusive": 32.0
-    },
+    "requiredVoltage": { "minExclusive": 24.0, "maxExclusive": 32.0 },
     "correctBatteryId": "B"
   },
   "level3": {
-    "grid": {
-      "rows": 8,
-      "columns": 8
-    },
-    "coordinateSystem": {
-      "zeroBased": true,
-      "origin": "top-left",
-      "rowPositive": "south",
-      "columnPositive": "east"
-    },
-    "start": {
-      "row": 6,
-      "column": 1,
-      "orientation": "NORTH"
-    },
-    "goal": {
-      "row": 3,
-      "column": 3
-    },
+    "grid": { "rows": 8, "columns": 8 },
+    "coordinateSystem": { "zeroBased": true, "origin": "top-left", "rowPositive": "south", "columnPositive": "east" },
+    "start": { "row": 6, "column": 1, "orientation": "NORTH" },
+    "goal": { "row": 3, "column": 3 },
     "obstacles": [],
     "walkableCells": 64,
     "blockLimit": 8,
-    "commands": {
-      "forward": "AVANZAR",
-      "left": "GIRAR IZQ.",
-      "right": "GIRAR DER."
-    }
+    "commands": { "forward": "AVANZAR", "left": "GIRAR IZQ.", "right": "GIRAR DER." }
+  },
+  "level4": {
+    "grid": { "rows": 8, "columns": 8 },
+    "coordinateSystem": { "zeroBased": true, "origin": "top-left", "rowPositive": "south", "columnPositive": "east" },
+    "start": { "row": 6, "column": 1, "orientation": "NORTH" },
+    "goal": { "row": 2, "column": 3 },
+    "obstacles": [
+      { "row": 4, "column": 1 },
+      { "row": 4, "column": 2 }
+    ],
+    "walkableCells": 62,
+    "blockLimit": 30,
+    "commands": { "forward": "AVANZAR", "left": "GIRAR IZQ.", "right": "GIRAR DER." }
   }
 }
