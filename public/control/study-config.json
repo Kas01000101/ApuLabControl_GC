@@ -1,0 +1,46 @@
+{
+  "version": "apulab-control-study-config-v1",
+  "sourceRepository": "Kas01000101/ApuLabStationGame",
+  "sourceCommit": "2f94e9e701172ab455767757225110606b983597",
+  "level2": {
+    "batteries": [
+      { "id": "A", "voltage": 24.0 },
+      { "id": "B", "voltage": 28.0 },
+      { "id": "C", "voltage": 32.0 }
+    ],
+    "requiredVoltage": {
+      "minExclusive": 24.0,
+      "maxExclusive": 32.0
+    },
+    "correctBatteryId": "B"
+  },
+  "level3": {
+    "grid": {
+      "rows": 8,
+      "columns": 8
+    },
+    "coordinateSystem": {
+      "zeroBased": true,
+      "origin": "top-left",
+      "rowPositive": "south",
+      "columnPositive": "east"
+    },
+    "start": {
+      "row": 6,
+      "column": 1,
+      "orientation": "NORTH"
+    },
+    "goal": {
+      "row": 3,
+      "column": 3
+    },
+    "obstacles": [],
+    "walkableCells": 64,
+    "blockLimit": 8,
+    "commands": {
+      "forward": "AVANZAR",
+      "left": "GIRAR IZQ.",
+      "right": "GIRAR DER."
+    }
+  }
+}

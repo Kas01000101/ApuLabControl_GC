@@ -71,10 +71,20 @@ async function persistEvidence(error) {
   await missionFrame.waitFor({ state: 'visible' });
 
   async function waitForLevel(level) {
+    // The iframe URL can change before Mission01Screen commits activeLevel.
+    // Wait for the native same-frame transition to settle before synthesizing
+    // the next completion event, otherwise a valid event can be ignored as stale.
     await page.waitForFunction((n) => {
       const frame = document.querySelector('iframe.mission01-frame');
       if (!frame?.contentWindow) return false;
-      try { return frame.contentWindow.location.pathname.endsWith(`/missions/mission01/level${n}.html`); }
+      try {
+        const correctPath = frame.contentWindow.location.pathname.endsWith(`/missions/mission01/level${n}.html`);
+        const settled = frame.classList.contains('is-active')
+          && !frame.classList.contains('is-loading')
+          && !frame.classList.contains('is-entering')
+          && frame.getAttribute('aria-hidden') === 'false';
+        return correctPath && settled;
+      }
       catch { return false; }
     }, level);
     const frames = page.locator('iframe.mission01-frame');
