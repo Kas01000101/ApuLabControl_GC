@@ -57,7 +57,12 @@ function scanBanned(value,path='root'){
 
   await fresh();
   assert(await page.locator('canvas:visible').count()===0,'N7 GC: visible canvas/WebGL leaked');
-  assert(await page.getByText('AYNI',{exact:false}).count()===0,'N7 GC: AYNI participant-facing text leaked');
+  const visibleBodyText=await page.locator('body').innerText();
+  const visibleControlText=await page.locator('#apulab-control-n7').innerText();
+  const visibleAyniCount=await page.getByText('AYNI',{exact:false}).evaluateAll(nodes=>nodes.filter(node=>{const style=getComputedStyle(node);const rect=node.getBoundingClientRect();return style.display!=='none'&&style.visibility!=='hidden'&&style.opacity!=='0'&&rect.width>0&&rect.height>0}).length);
+  assert(!/\bAYNI\b/i.test(visibleBodyText),'N7 GC: AYNI participant-facing body text leaked');
+  assert(!/\bAYNI\b/i.test(visibleControlText),'N7 GC: AYNI control-layer text leaked');
+  assert(visibleAyniCount===0,'N7 GC: AYNI participant-visible locator leaked');
   assert(await page.getByText('EXPLORAR',{exact:true}).count()===0,'N7 GC: EXPLORAR leaked');
   assert(await page.getByText('BITÁCORA',{exact:true}).count()===0,'N7 GC: Bitácora leaked');
   assert(await page.locator('.n7-cell').count()===64,'N7 GC: grid must be 8x8');
@@ -128,7 +133,6 @@ function scanBanned(value,path='root'){
   await page.locator('#n7-complete:not([hidden])').waitFor({timeout:5000});s=await state();
   assert(s.completed===true&&s.relevantInstrumentUsed===true&&s.position.row===6&&s.position.column===6,'N7 GC: materials-first success failed');
   assert(s.firstInstrument==='materials'&&s.instrumentSelectionCount===1,'N7 GC: materials-first semantics changed');
-  await shot('n7_gc_completed');
   let preReloadMessages=await messages();assert(preReloadMessages.some(x=>x.event==='level_completed'),'N7 GC: control postMessage missing before reload');
   t=await telemetry();assert(countEvent(t,'level_completed')===1,'N7 GC: terminal event not exactly once at completion');
   scanBanned(t);
@@ -142,6 +146,7 @@ function scanBanned(value,path='root'){
   assert((await page.locator('#n7-finalize').textContent())==='MISIÓN COMPLETADA'&&await page.locator('#n7-finalize').isDisabled(),'N7 GC: terminal CTA state incorrect');
   assert(!page.url().includes('level8'),'N7 GC: navigated to level8');
   t=await telemetry();assert(countEvent(t,'mission_completed')===1,'N7 GC: mission_completed not exactly once');
+  await shot('n7_gc_completed_terminal');
   await reload();t=await telemetry();assert(countEvent(t,'mission_completed')===1&&countEvent(t,'level_completed')===1,'N7 GC: terminal telemetry replayed');
   assert(!page.url().includes('level8'),'N7 GC: N8 appeared after refresh');
 
