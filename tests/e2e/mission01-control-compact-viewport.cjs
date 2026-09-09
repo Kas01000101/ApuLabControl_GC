@@ -99,7 +99,7 @@ async function shot(name) {
   await shot('compact_n4_initial.png');
 
   await loadLevel(5);
-  await assertCore(5, ['#apulab-control-n5', '.n5-main', '.board-panel', '.editor-panel', '.controls', '.feedback']);
+  await assertCore(5, ['#apulab-control-n5', '#apulab-control-n5 .n5-main', '#apulab-control-n5 .board-panel', '#apulab-control-n5 .editor-panel', '#apulab-control-n5 .controls', '#apulab-control-n5 #n5-feedback']);
   await shot('compact_n5_initial.png');
 
   await loadLevel(6);
