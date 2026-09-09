@@ -18,7 +18,7 @@ jobs:
         run: npm ci --no-fund --no-audit
       - name: Build
         run: npm run build
-      - name: Static N1-N6 contracts
+      - name: Static N1-N7 contracts
         run: |
           node scripts/audit-mission01-control-n1.mjs
           node scripts/audit-mission01-control-n2.mjs
@@ -27,6 +27,7 @@ jobs:
           node scripts/audit-mission01-control-n4.mjs
           node scripts/audit-mission01-control-n5.mjs
           node scripts/audit-mission01-control-n6.mjs
+          node scripts/audit-mission01-control-n7.mjs
       - name: Frozen N1/N2 exact regression
         run: |
           set -euo pipefail
@@ -64,8 +65,8 @@ jobs:
           (cd /tmp/n6 && npm ci --no-fund --no-audit && npm run build)
           cmp /tmp/n6/public/missions/mission01/level6.html public/missions/mission01/level6.html
           for f in public/control/n6-control.js public/control/n6-control.css scripts/patch-mission01-control-n6.mjs scripts/audit-mission01-control-n6.mjs src/systems/Level6TelemetryBridge.ts tests/e2e/mission01-control-n6.cjs; do cmp "/tmp/n6/$f" "$f"; done
-      - name: N7 exact parity
-        run: test "03e125bf9bb41f960039343a652dad358060a271c1c1050b61347f59d4e02eca" = "$(sha256sum public/missions/mission01/level7.html|awk '{print $1}')"
+      - name: N7 control contract
+        run: node scripts/audit-mission01-control-n7.mjs
       - name: Playwright Chromium
         run: |
           npm install --global playwright@1.55.0 --no-fund --no-audit
@@ -74,7 +75,9 @@ jobs:
       - name: Preview
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/preview.log 2>&1 &
-          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done; cat /tmp/preview.log; exit 1
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/preview.log
+          exit 1
       - name: Frozen N1 physical regression
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: node tests/e2e/mission01-control-n1-freeze.cjs
@@ -97,17 +100,6 @@ jobs:
       - name: Frozen N6 physical regression
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: node tests/e2e/mission01-control-n6.cjs
-      - name: N7 downstream physical contract
-        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
-        run: node tests/e2e/mission01-level7-contract.cjs
-      - name: Upload N6 evidence
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: control-n6-frozen-regression-evidence
-          path: test-results/n6-control
-          if-no-files-found: error
-          retention-days: 7
       - name: Preview log on failure
         if: failure()
         run: cat /tmp/preview.log || true

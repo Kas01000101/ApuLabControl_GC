@@ -1,4 +1,4 @@
-name: Control N3-N6 Exact Regression Gate
+name: Control N7 Validation Gate
 on:
   push:
     branches: [research/control-active]
@@ -6,9 +6,9 @@ on:
 permissions:
   contents: read
 jobs:
-  frozen-exact:
+  validate-control-n7:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 100
     steps:
       - uses: actions/checkout@v5
         with: { fetch-depth: 0 }
@@ -16,7 +16,7 @@ jobs:
         with: { node-version: '22.16.0', cache: npm }
       - name: Install
         run: npm ci --no-fund --no-audit
-      - name: Build
+      - name: Build and baseline-lock N7 before adapter
         run: npm run build
       - name: Static N1-N7 contracts
         run: |
@@ -28,6 +28,12 @@ jobs:
           node scripts/audit-mission01-control-n5.mjs
           node scripts/audit-mission01-control-n6.mjs
           node scripts/audit-mission01-control-n7.mjs
+      - name: N7 historical generated baseline lock
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n7-baseline 4b445dee421feba1b93205b44b214f4bf2f82604
+          (cd /tmp/n7-baseline && npm ci --no-fund --no-audit && npm run build)
+          test "03e125bf9bb41f960039343a652dad358060a271c1c1050b61347f59d4e02eca" = "$(sha256sum /tmp/n7-baseline/public/missions/mission01/level7.html|awk '{print $1}')"
       - name: Frozen N1/N2 exact regression
         run: |
           set -euo pipefail
@@ -65,5 +71,50 @@ jobs:
           (cd /tmp/n6 && npm ci --no-fund --no-audit && npm run build)
           cmp /tmp/n6/public/missions/mission01/level6.html public/missions/mission01/level6.html
           for f in public/control/n6-control.js public/control/n6-control.css scripts/patch-mission01-control-n6.mjs scripts/audit-mission01-control-n6.mjs src/systems/Level6TelemetryBridge.ts tests/e2e/mission01-control-n6.cjs; do cmp "/tmp/n6/$f" "$f"; done
-      - name: N7 control contract
-        run: node scripts/audit-mission01-control-n7.mjs
+      - name: Playwright Chromium
+        run: |
+          npm install --global playwright@1.55.0 --no-fund --no-audit
+          playwright install --with-deps chromium
+          echo "NODE_PATH=$(npm root -g)" >> "$GITHUB_ENV"
+      - name: Preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/preview.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/preview.log
+          exit 1
+      - name: Frozen N1 physical regression
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: node tests/e2e/mission01-control-n1-freeze.cjs
+      - name: Frozen N3 physical regression
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: |
+          node tests/e2e/mission01-control-n3-persistence.cjs
+          node tests/e2e/mission01-control-n3-alternate.cjs
+          node tests/e2e/mission01-control-n3-telemetry.cjs
+      - name: Frozen N4 physical regression
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: |
+          node tests/e2e/mission01-control-n4.cjs
+          node tests/e2e/mission01-control-n4-alternate.cjs
+          node tests/e2e/mission01-control-n4-telemetry.cjs
+          node tests/e2e/mission01-control-n4-transition.cjs
+      - name: Frozen N5 physical regression
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: node tests/e2e/mission01-control-n5.cjs
+      - name: Frozen N6 physical regression
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: node tests/e2e/mission01-control-n6.cjs
+      - name: N7 physical science persistence telemetry privacy idempotency strategies and terminal
+        env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
+        run: node tests/e2e/mission01-control-n7.cjs
+      - name: Upload N7 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: control-n7-validation-evidence
+          path: test-results/n7-control
+          if-no-files-found: error
+          retention-days: 7
+      - name: Preview log on failure
+        if: failure()
+        run: cat /tmp/preview.log || true
