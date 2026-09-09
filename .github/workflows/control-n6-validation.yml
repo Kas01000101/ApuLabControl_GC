@@ -1,4 +1,4 @@
-name: Control N6 Validation Gate
+name: Control N6 Frozen Regression Gate
 on:
   push:
     branches: [research/control-active]
@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 jobs:
-  validate-control-n6:
+  validate-frozen-n6:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -16,7 +16,7 @@ jobs:
         with: { node-version: '22.16.0', cache: npm }
       - name: Install
         run: npm ci --no-fund --no-audit
-      - name: Build and baseline-lock N6 before adapter
+      - name: Build
         run: npm run build
       - name: Static N1-N6 contracts
         run: |
@@ -27,13 +27,6 @@ jobs:
           node scripts/audit-mission01-control-n4.mjs
           node scripts/audit-mission01-control-n5.mjs
           node scripts/audit-mission01-control-n6.mjs
-      - name: N6 historical generated baseline lock
-        run: |
-          set -euo pipefail
-          git worktree add --detach /tmp/n6-baseline 0212e34e49b863921d7386cdc6ba0c12c7f2536e
-          (cd /tmp/n6-baseline && npm ci --no-fund --no-audit && npm run build)
-          test "53cfd03663c5604a3878132f2e9313caa638bb413935fa4b730415c647ff9bca" = "$(sha256sum /tmp/n6-baseline/public/missions/mission01/level6.html|awk '{print $1}')"
-          test "03e125bf9bb41f960039343a652dad358060a271c1c1050b61347f59d4e02eca" = "$(sha256sum /tmp/n6-baseline/public/missions/mission01/level7.html|awk '{print $1}')"
       - name: Frozen N1/N2 exact regression
         run: |
           set -euo pipefail
@@ -64,6 +57,13 @@ jobs:
           (cd /tmp/n5 && npm ci --no-fund --no-audit && npm run build)
           cmp /tmp/n5/public/missions/mission01/level5.html public/missions/mission01/level5.html
           for f in public/control/n5-control.js public/control/n5-control.css scripts/patch-mission01-control-n5.mjs scripts/audit-mission01-control-n5.mjs tests/e2e/mission01-control-n5.cjs; do cmp "/tmp/n5/$f" "$f"; done
+      - name: Frozen N6 exact regression
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n6 origin/research/control-n6-freeze
+          (cd /tmp/n6 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n6/public/missions/mission01/level6.html public/missions/mission01/level6.html
+          for f in public/control/n6-control.js public/control/n6-control.css scripts/patch-mission01-control-n6.mjs scripts/audit-mission01-control-n6.mjs src/systems/Level6TelemetryBridge.ts tests/e2e/mission01-control-n6.cjs; do cmp "/tmp/n6/$f" "$f"; done
       - name: N7 exact parity
         run: test "03e125bf9bb41f960039343a652dad358060a271c1c1050b61347f59d4e02eca" = "$(sha256sum public/missions/mission01/level7.html|awk '{print $1}')"
       - name: Playwright Chromium
@@ -94,7 +94,7 @@ jobs:
       - name: Frozen N5 physical regression
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: node tests/e2e/mission01-control-n5.cjs
-      - name: N6 physical causal persistence telemetry privacy idempotency alternate and N6-to-N7
+      - name: Frozen N6 physical regression
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: node tests/e2e/mission01-control-n6.cjs
       - name: N7 downstream physical contract
@@ -104,7 +104,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: control-n6-validation-evidence
+          name: control-n6-frozen-regression-evidence
           path: test-results/n6-control
           if-no-files-found: error
           retention-days: 7
