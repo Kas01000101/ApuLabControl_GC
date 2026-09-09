@@ -80,7 +80,7 @@ for (const token of [
   "data.type === 'apulab-control-n6-telemetry'",
   "participant_id: state.participantId",
   "session_id: state.sessionId",
-  "condition: 'GC'",
+  "condition: isControlMessage ? 'GC'",
   "level: 6",
 ]) if (!bridge.includes(token)) fail(`bridge_missing:${token}`);
 
