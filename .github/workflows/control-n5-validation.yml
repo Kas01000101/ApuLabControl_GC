@@ -49,6 +49,13 @@ jobs:
           (cd /tmp/n4 && npm ci --no-fund --no-audit && npm run build)
           cmp /tmp/n4/public/missions/mission01/level4.html public/missions/mission01/level4.html
           for f in public/control/n4-control.js public/control/n4-control.css scripts/patch-mission01-control-n4.mjs scripts/audit-mission01-control-n4.mjs src/systems/Level4ControlTelemetryBridge.ts; do cmp "/tmp/n4/$f" "$f"; done
+      - name: Frozen N5 exact regression
+        run: |
+          set -euo pipefail
+          git worktree add --detach /tmp/n5 ef2da8c90773f3c3b79c4e7a0f1576a801bd3283
+          (cd /tmp/n5 && npm ci --no-fund --no-audit && npm run build)
+          cmp /tmp/n5/public/missions/mission01/level5.html public/missions/mission01/level5.html
+          for f in public/control/n5-control.js public/control/n5-control.css scripts/patch-mission01-control-n5.mjs scripts/audit-mission01-control-n5.mjs tests/e2e/mission01-control-n5.cjs; do cmp "/tmp/n5/$f" "$f"; done
       - name: N6/N7 generated parity
         run: |
           set -euo pipefail
