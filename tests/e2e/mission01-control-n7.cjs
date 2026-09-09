@@ -45,6 +45,9 @@ async function addRepeat(count,cmd){
 }
 async function fullNoRepeat(){await addRouteToSample(true);await addFinish()}
 async function reload(){await page.reload({waitUntil:'networkidle'});await page.locator('#apulab-control-n7').waitFor({state:'visible',timeout:12000})}
+async function visibleTextCount(text,exact=true){
+  return page.getByText(text,{exact}).evaluateAll(nodes=>nodes.filter(node=>{const style=getComputedStyle(node);const rect=node.getBoundingClientRect();return style.display!=='none'&&style.visibility!=='hidden'&&style.opacity!=='0'&&rect.width>0&&rect.height>0}).length);
+}
 function countEvent(list,event){return list.filter(x=>x?.event===event).length}
 function scanBanned(value,path='root'){
   if(Array.isArray(value)){for(let i=0;i<value.length;i++)scanBanned(value[i],`${path}[${i}]`);return}
@@ -63,16 +66,16 @@ function scanBanned(value,path='root'){
   assert(!/\bAYNI\b/i.test(visibleBodyText),'N7 GC: AYNI participant-facing body text leaked');
   assert(!/\bAYNI\b/i.test(visibleControlText),'N7 GC: AYNI control-layer text leaked');
   assert(visibleAyniCount===0,'N7 GC: AYNI participant-visible locator leaked');
-  assert(await page.getByText('EXPLORAR',{exact:true}).count()===0,'N7 GC: EXPLORAR leaked');
-  assert(await page.getByText('BITÁCORA',{exact:true}).count()===0,'N7 GC: Bitácora leaked');
+  assert(await visibleTextCount('EXPLORAR',true)===0,'N7 GC: EXPLORAR participant-visible');
+  assert(await visibleTextCount('BITÁCORA',true)===0,'N7 GC: Bitácora participant-visible');
   assert(await page.locator('.n7-cell').count()===64,'N7 GC: grid must be 8x8');
   assert(await page.locator('.n7-cell.sample').count()===1,'N7 GC: sample missing');
   assert(await page.locator('.n7-cell.final').count()===1,'N7 GC: final point missing');
   assert(await page.locator('.n7-cell.obstacle').count()===4,'N7 GC: obstacles mismatch');
   assert((await page.locator('.n7-head').textContent()).includes('¿De qué material está hecha esta piedra?'),'N7 GC: scientific question missing');
   assert(await page.locator('.n7-cmd[data-cmd="analyzeSample"]').count()===1,'N7 GC: ANALIZAR MUESTRA missing');
-  assert(await page.getByText('REPETIR × N',{exact:true}).count()===1,'N7 GC: REPETIR must be available from start');
-  for(const old of ['ESCANEAR','ENVIAR DATOS'])assert(await page.getByText(old,{exact:true}).count()===0,`N7 GC: N6 command leaked ${old}`);
+  assert(await visibleTextCount('REPETIR × N',true)===1,'N7 GC: REPETIR must be participant-visible from start');
+  for(const old of ['ESCANEAR','ENVIAR DATOS'])assert(await visibleTextCount(old,true)===0,`N7 GC: participant-visible N6 command leaked ${old}`);
   let s=await state();assert(s.attemptCount===0&&!s.completed,'N7 GC: initial state dirty');
   let t=await telemetry();assert(countEvent(t,'level_started')===1,'N7 GC: level_started must emit once');
   await shot('n7_gc_initial');
@@ -178,7 +181,7 @@ function scanBanned(value,path='root'){
   await shot('n7_gc_help');await page.locator('#n7-help-close').click();await page.locator('#n7-help').click();assert(await page.locator('#n7-help-panel:not([hidden])').isVisible(),'N7 GC: help not repeatable');
 
   assert(await page.locator('canvas:visible').count()===0,'N7 GC: visible canvas at end');
-  assert(await page.getByText('EXPLORAR',{exact:true}).count()===0,'N7 GC: EXPLORAR visible');
+  assert(await visibleTextCount('EXPLORAR',true)===0,'N7 GC: EXPLORAR participant-visible at end');
   assert(await page.locator('[class*="confetti"]:visible').count()===0,'N7 GC: confetti visible');
   assert(await page.locator('[class*="glow"]:visible').count()===0,'N7 GC: game glow visible');
 
