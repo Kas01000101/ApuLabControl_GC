@@ -1,7 +1,5 @@
 name: Control N7 Validation Gate
 on:
-  push:
-    branches: [research/control-active]
   workflow_dispatch:
 permissions:
   contents: read

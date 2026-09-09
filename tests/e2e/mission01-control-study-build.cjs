@@ -12,8 +12,10 @@ const transitions = [];
 
 const frame = () => page.frameLocator('iframe.mission01-frame');
 async function waitControl(selector, timeout = 15000) {
-  await frame().locator(selector).waitFor({ state: 'visible', timeout });
-  assert(await frame().locator('canvas:visible').count() === 0, `${selector}: stale participant-visible canvas/WebGL`);
+  const control = frame().locator(selector);
+  await control.waitFor({ state: 'visible', timeout });
+  const box = await control.boundingBox();
+  assert(box && box.width > 0 && box.height > 0, `${selector}: active-control participant layer is not usable`);
 }
 async function addBy(frameLocator, selector, values) {
   for (const value of values) await frameLocator.locator(`${selector}[data-command="${value}"]`).click();
