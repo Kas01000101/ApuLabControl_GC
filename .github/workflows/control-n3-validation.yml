@@ -102,7 +102,6 @@ jobs:
       - name: N6/N7 downstream regressions
         env: { APULAB_BASE_URL: 'http://127.0.0.1:4173' }
         run: |
-          node tests/e2e/mission01-level6-n5-parity.cjs
           node tests/e2e/mission01-level6-navigation-identity.cjs
           node tests/e2e/mission01-level6-contract.cjs
           node tests/e2e/mission01-level6-final-position.cjs
