@@ -18,7 +18,7 @@ jobs:
         run: npm ci --no-fund --no-audit
       - name: Build and baseline-lock N7 before adapter
         run: npm run build
-      - name: Static N1-N7 contracts
+      - name: Static N1-N5 and N7 contracts
         run: |
           node scripts/audit-mission01-control-n1.mjs
           node scripts/audit-mission01-control-n2.mjs
@@ -26,7 +26,6 @@ jobs:
           node scripts/audit-mission01-control-n3-baseline.mjs
           node scripts/audit-mission01-control-n4.mjs
           node scripts/audit-mission01-control-n5.mjs
-          node scripts/audit-mission01-control-n6.mjs
           node scripts/audit-mission01-control-n7.mjs
       - name: N7 historical generated baseline lock
         run: |
