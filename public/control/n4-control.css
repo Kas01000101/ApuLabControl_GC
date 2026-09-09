@@ -1,0 +1,47 @@
+/* APULAB_CONTROL_N4_V1 */
+html, body { margin: 0; width: 100%; height: 100%; }
+body.apulab-control-n4-active { overflow: hidden !important; background: #f4f6f8 !important; color: #17202a !important; font-family: Poppins, Inter, Arial, sans-serif !important; }
+#apulab-control-n4,#apulab-control-n4 * { box-sizing: border-box; font-family: Poppins, Inter, Arial, sans-serif; }
+#apulab-control-n4 { position: fixed; inset: 0; z-index: 2147483000; display: grid; grid-template-rows: auto minmax(0,1fr) auto auto; gap: 12px; padding: 22px 32px 18px; background: #f4f6f8; color: #17202a; }
+.control-n4-header { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; padding-bottom:12px; border-bottom:1px solid #cbd2d9; }
+.control-n4-kicker,.control-n4-step { display:block; color:#4b5967; font-size:12px; font-weight:700; letter-spacing:.09em; }
+.control-n4-header h1 { margin:4px 0 2px; font-size:clamp(23px,2vw,32px); line-height:1.16; font-weight:700; }
+.control-n4-header p,.control-n4-board-note { margin:0; color:#53606d; font-size:14px; }
+.control-n4-main { min-height:0; display:grid; grid-template-columns:minmax(520px,1fr) minmax(390px,.76fr); gap:18px; align-items:stretch; }
+.control-n4-board-panel,.control-n4-sequence-panel { min-height:0; border:1px solid #c7ced6; border-radius:14px; background:#fff; padding:14px 16px; }
+.control-n4-board-panel { display:grid; grid-template-rows:auto minmax(0,1fr) auto; gap:9px; }
+.control-n4-sequence-panel { display:grid; grid-template-rows:auto minmax(0,1fr) auto; gap:10px; }
+.control-n4-section-heading { display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.control-n4-section-heading h2 { margin:2px 0 0; font-size:19px; }
+.control-n4-legend { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px 12px; color:#4b5967; font-size:11px; font-weight:600; }
+.control-n4-legend span { display:inline-flex; align-items:center; gap:5px; }
+.control-n4-legend i { width:12px; height:12px; border:1px solid #6d7883; }
+.start-key{background:#eef2f5}.obstacle-key{background:#d9dee3}.goal-key{background:#dfece4}
+.control-n4-board { align-self:center; justify-self:center; display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); width:min(50vh,560px,100%); aspect-ratio:1/1; border:1px solid #7c8792; background:#fff; }
+.control-n4-cell { position:relative; min-width:0; min-height:0; display:flex; align-items:center; justify-content:center; border-right:1px solid #d9dee3; border-bottom:1px solid #d9dee3; background:#fff; overflow:hidden; }
+.control-n4-cell:nth-child(8n){border-right:0}.control-n4-cell:nth-last-child(-n+8){border-bottom:0}.control-n4-cell.is-path{background:#eef3f7}.control-n4-cell.is-start{background:#e7edf2}.control-n4-cell.is-goal{background:#dfece4}
+.control-n4-cell.is-obstacle { background:#d9dee3; box-shadow:inset 0 0 0 2px #8a949e; }
+.control-n4-cell.is-collision { background:#f5e4e2; box-shadow:inset 0 0 0 3px #a54a42; }
+.control-n4-start-marker,.control-n4-goal-marker,.control-n4-obstacle-marker { display:flex; flex-direction:column; align-items:center; gap:1px; text-align:center; font-size:clamp(8px,.7vw,11px); font-weight:700; line-height:1.05; }
+.control-n4-start-marker b { font-size:clamp(17px,1.5vw,25px); line-height:1; }
+.control-n4-obstacle-marker { color:#48535e; font-size:clamp(7px,.62vw,10px); }
+.control-n4-route-index { position:absolute; right:4px; bottom:3px; color:#3e566a; font-size:9px; line-height:1; }
+.control-n4-count { min-width:68px; text-align:center; padding:5px 8px; border:1px solid #b8c1ca; border-radius:999px; color:#3f4a55; font-size:12px; font-weight:700; }
+.control-n4-program { min-height:0; margin:0; padding:0 4px 0 0; list-style:none; overflow:auto; }
+.control-n4-program-empty { padding:16px 12px; border:1px dashed #b8c1ca; border-radius:10px; color:#687580; font-size:13px; }
+.control-n4-program-item { display:grid; grid-template-columns:30px 1fr auto; align-items:center; gap:8px; min-height:38px; margin-bottom:6px; padding:6px 8px; border:1px solid #d5dbe1; border-radius:9px; background:#fbfcfd; }
+.control-n4-program-item.is-error { border:2px solid #a54a42; background:#f8eeee; }
+.control-n4-program-number { display:grid; place-items:center; width:24px; height:24px; border:1px solid #aeb8c2; border-radius:50%; color:#4b5967; font-size:11px; font-weight:700; }
+.control-n4-program-label { font-size:13px; font-weight:650; }
+.control-n4-program-remove { border:0; background:transparent; color:#52606d; font-size:11px; text-decoration:underline; cursor:pointer; }
+.control-n4-program-remove:disabled{opacity:.45;cursor:default}
+.control-n4-controls { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:11px 14px; border:1px solid #c7ced6; border-radius:12px; background:#fff; }
+.control-n4-command-group{display:flex;gap:9px}.control-n4-command,.control-n4-button{min-height:40px;border-radius:9px;padding:9px 15px;font-size:12px;font-weight:700;letter-spacing:.025em;cursor:pointer}
+.control-n4-command{border:1px solid #7e8a96;background:#f7f9fa;color:#25313c}.control-n4-button.primary{border:1px solid #1f3e56;background:#1f3e56;color:#fff}.control-n4-button.secondary{border:1px solid #7e8a96;background:#fff;color:#25313c}.control-n4-button.full{width:100%}.control-n4-command:disabled,.control-n4-button:disabled{opacity:.45;cursor:default}
+.control-n4-feedback { min-height:38px; display:flex; align-items:center; padding:8px 12px; border:1px solid #c7ced6; border-radius:10px; background:#fff; color:#53606d; font-size:12px; }
+.control-n4-feedback.is-error{border-color:#b8736d;background:#f8eeee;color:#7e312b}.control-n4-feedback.is-success{border-color:#839f8d;background:#edf4ef;color:#2c5b3b}
+.control-n4-help-panel { position:fixed; inset:0; z-index:2147483100; display:grid; place-items:center; background:rgba(244,246,248,.96); }.control-n4-help-panel[hidden]{display:none!important}
+.control-n4-help-panel>div{width:min(720px,88vw);padding:24px 28px;border:1px solid #aeb7c0;border-radius:14px;background:#fff}.control-n4-help-panel h2{margin:0 0 12px;font-size:22px}.control-n4-help-panel ol{margin:0;padding-left:22px;color:#3f4a55;line-height:1.7}.control-n4-help-panel>.control-n4-button{position:fixed;right:34px;top:28px}
+.control-n4-completion { position:fixed; inset:0; z-index:2147483200; display:grid; place-items:center; background:rgba(244,246,248,.96); }.control-n4-completion[hidden]{display:none!important}
+.control-n4-completion-card{width:min(520px,88vw);padding:28px;border:1px solid #9da8b2;border-radius:14px;background:#fff;text-align:center}.control-n4-completion-card h2{margin:0 0 8px;font-size:24px}.control-n4-completion-card p{margin:0 0 18px;color:#53606d}
+@media(max-width:1050px){#apulab-control-n4{overflow:auto;position:absolute;min-height:100%}body.apulab-control-n4-active{overflow:auto!important}.control-n4-main{grid-template-columns:1fr}.control-n4-board{width:min(72vw,520px)}}

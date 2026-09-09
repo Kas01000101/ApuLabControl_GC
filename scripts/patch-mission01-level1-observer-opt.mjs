@@ -37,3 +37,7 @@ if (html.includes('flowObserver.observe(document.body')) {
 
 await writeFile(LEVEL1_PATH, html, 'utf8');
 console.info('[mission01] Level 1 · observer pedagógico acotado al panel contextual');
+
+// N1-only control-condition adapter. Kept behind this N1-specific hook so the
+// shared Mission 01 pipeline and Levels 2–7 remain byte-for-byte untouched.
+await import('./patch-mission01-control-n1.mjs');

@@ -1,0 +1,466 @@
+/* APULAB_CONTROL_N3_V1
+   Flat, active and neutral control condition for N3 · SECUENCIAR. */
+
+body.apulab-control-n3-active {
+  margin: 0;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+#apulab-control-n3,
+#apulab-control-n3 * {
+  box-sizing: border-box;
+}
+
+#apulab-control-n3 {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  min-height: 0;
+  padding: 20px 24px 18px;
+  overflow: auto;
+  background: #f3f4f6;
+  color: #172033;
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.control-n3-header,
+.control-n3-section-heading,
+.control-n3-controls,
+.control-n3-legend,
+.control-n3-command-group {
+  display: flex;
+  align-items: center;
+}
+
+.control-n3-header {
+  justify-content: space-between;
+  gap: 24px;
+  width: min(1320px, 100%);
+  margin: 0 auto;
+  padding: 18px 20px;
+  border: 1px solid #c7cbd3;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.control-n3-header h1,
+.control-n3-section-heading h2,
+.control-n3-help-panel h2,
+.control-n3-completion-card h2 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.control-n3-header h1 {
+  margin-top: 4px;
+  font-size: clamp(20px, 2vw, 30px);
+  line-height: 1.2;
+}
+
+.control-n3-header p,
+.control-n3-board-note,
+.control-n3-feedback,
+.control-n3-help-panel ol,
+.control-n3-completion-card p {
+  margin: 0;
+  color: #4b5565;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.control-n3-header p {
+  margin-top: 6px;
+}
+
+.control-n3-kicker,
+.control-n3-step {
+  display: inline-block;
+  color: #566174;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.control-n3-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 360px);
+  gap: 14px;
+  width: min(1320px, 100%);
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+
+.control-n3-board-panel,
+.control-n3-sequence-panel,
+.control-n3-controls,
+.control-n3-feedback {
+  border: 1px solid #c7cbd3;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.control-n3-board-panel,
+.control-n3-sequence-panel {
+  min-width: 0;
+  padding: 16px;
+}
+
+.control-n3-section-heading {
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 50px;
+  margin-bottom: 12px;
+}
+
+.control-n3-section-heading h2 {
+  margin-top: 2px;
+  font-size: 20px;
+}
+
+.control-n3-legend {
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  color: #4b5565;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.control-n3-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.control-n3-legend i {
+  width: 14px;
+  height: 14px;
+  border: 1px solid #657083;
+  border-radius: 3px;
+}
+
+.control-n3-legend .start-key {
+  background: #dce8f5;
+}
+
+.control-n3-legend .goal-key {
+  background: #dfe9df;
+}
+
+.control-n3-board {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(34px, 1fr));
+  width: min(50vh, 650px, 100%);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-top: 1px solid #8d96a4;
+  border-left: 1px solid #8d96a4;
+  background: #ffffff;
+}
+
+.control-n3-cell {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  border-right: 1px solid #8d96a4;
+  border-bottom: 1px solid #8d96a4;
+  background: #ffffff;
+}
+
+.control-n3-cell.is-path {
+  background: #edf1f5;
+}
+
+.control-n3-cell.is-start {
+  background: #dce8f5;
+}
+
+.control-n3-cell.is-goal {
+  background: #dfe9df;
+}
+
+.control-n3-start-marker,
+.control-n3-goal-marker {
+  position: absolute;
+  inset: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  color: #172033;
+  font-size: clamp(8px, 0.85vw, 12px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.control-n3-start-marker b {
+  margin-top: 2px;
+  font-size: clamp(18px, 2vw, 30px);
+  line-height: 1;
+}
+
+.control-n3-route-index {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  z-index: 2;
+  color: #566174;
+  font-size: clamp(7px, 0.7vw, 10px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.control-n3-board-note {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.control-n3-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #aeb5c0;
+  border-radius: 8px;
+  background: #f7f8fa;
+  color: #263247;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.control-n3-program {
+  display: grid;
+  gap: 7px;
+  min-height: 0;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  counter-reset: control-n3-program;
+}
+
+.control-n3-program-item {
+  counter-increment: control-n3-program;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
+  align-items: center;
+  min-height: 42px;
+  border: 1px solid #d0d4db;
+  border-radius: 8px;
+  background: #f8f9fb;
+  color: #303b4f;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.control-n3-program-item::before {
+  content: counter(control-n3-program) ".";
+  padding-left: 10px;
+  color: #6b7483;
+  font-variant-numeric: tabular-nums;
+}
+
+.control-n3-program-item.is-filled {
+  background: #ffffff;
+  border-color: #9da6b4;
+}
+
+.control-n3-placeholder {
+  color: #adb3bd;
+}
+
+.control-n3-remove {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #aeb5c0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #313b4e;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.control-n3-remove:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.control-n3-controls {
+  justify-content: space-between;
+  gap: 16px;
+  width: min(1320px, 100%);
+  margin: 0 auto;
+  padding: 14px 16px;
+}
+
+.control-n3-command-group {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.control-n3-button,
+.control-n3-command {
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 1px solid #687386;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #172033;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.control-n3-button.primary {
+  border-color: #263247;
+  background: #263247;
+  color: #ffffff;
+}
+
+.control-n3-button.secondary,
+.control-n3-command {
+  background: #ffffff;
+}
+
+.control-n3-button.full {
+  width: 100%;
+}
+
+.control-n3-button:disabled,
+.control-n3-command:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.control-n3-button:focus-visible,
+.control-n3-command:focus-visible,
+.control-n3-remove:focus-visible {
+  outline: 3px solid #9bb7d5;
+  outline-offset: 2px;
+}
+
+.control-n3-feedback {
+  width: min(1320px, 100%);
+  min-height: 48px;
+  margin: 0 auto;
+  padding: 12px 16px;
+}
+
+.control-n3-help-panel {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  z-index: 2147483200;
+  width: min(560px, calc(100vw - 40px));
+  transform: translate(-50%, -50%);
+  padding: 22px;
+  border: 1px solid #687386;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.control-n3-help-panel[hidden],
+.control-n3-completion[hidden] {
+  display: none !important;
+}
+
+.control-n3-help-panel h2 {
+  margin-bottom: 12px;
+  font-size: 22px;
+}
+
+.control-n3-help-panel ol {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding-left: 22px;
+}
+
+.control-n3-completion {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483300;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(243, 244, 246, 0.94);
+}
+
+.control-n3-completion-card {
+  width: min(520px, 100%);
+  padding: 28px;
+  border: 1px solid #687386;
+  border-radius: 12px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.control-n3-completion-card h2 {
+  font-size: 24px;
+}
+
+.control-n3-completion-card p {
+  margin: 8px 0 18px;
+}
+
+@media (max-width: 900px) {
+  #apulab-control-n3 {
+    padding: 14px;
+  }
+
+  .control-n3-main {
+    grid-template-columns: 1fr;
+  }
+
+  .control-n3-board {
+    width: min(70vh, 560px, 100%);
+  }
+
+  .control-n3-sequence-panel {
+    max-height: none;
+  }
+
+  .control-n3-program {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .control-n3-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .control-n3-button.primary {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .control-n3-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .control-n3-legend {
+    justify-content: flex-start;
+  }
+
+  .control-n3-program {
+    grid-template-columns: 1fr;
+  }
+
+  .control-n3-command-group {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
