@@ -33,7 +33,7 @@ async function addRouteToSample(includeAnalyze=true){
   await add('forward',4);await add('right');await add('forward',4);if(includeAnalyze)await add('analyzeSample');
 }
 async function addFinish(){await add('forward');await add('right');await add('forward',3)}
-async function choose(id){await page.locator(`[data-instrument="${id}"]`).click();await page.locator('#n7-result:not([hidden])').waitFor({timeout:4000})}
+async function choose(id){await page.locator(`#n7-instruments [data-instrument="${id}"]`).click();await page.locator('#n7-result:not([hidden])').waitFor({timeout:4000})}
 async function continueResult(){await page.locator('#n7-result-continue').click()}
 async function changeInstrument(){await page.locator('#n7-change-instrument').click();await page.locator('#n7-instruments:not([hidden])').waitFor({timeout:4000})}
 async function addRepeat(count,cmd){
