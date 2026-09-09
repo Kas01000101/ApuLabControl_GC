@@ -16,7 +16,6 @@ if (hash(html) !== EXPECTED_BASELINE_SHA256) fail(`baseline_sha_mismatch:${hash(
 
 const requiredBaselineTokens = [
   'for(let r=0;r<8;r++){tiles[r]=[];for(let c=0;c<8;c++){',
-  'const scenarios=[{start:{c:1,r:6,dir:0},goal:{c:3,r:2},obstacles:[[1,4],[2,4]]}]',
   "forward:{label:'AVANZAR'",
   "left:{label:'GIRAR IZQ.'",
   "right:{label:'GIRAR DER.'",
@@ -36,4 +35,4 @@ if (!entry) fail('manifest_level4_missing');
 entry.bytes = Buffer.byteLength(html, 'utf8');
 entry.sha256 = hash(html);
 await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
-console.info('[mission01] CONTROL N4 V1 · flat 2D active-control adapter injected after verified baseline');
+console.info('[mission01] CONTROL N4 V1 · flat 2D active-control adapter injected after exact verified baseline SHA');
