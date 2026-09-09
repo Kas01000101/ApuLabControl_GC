@@ -1,0 +1,56 @@
+name: Control Study Build Final Gate
+on:
+  push:
+    branches: [research/control-active]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  final-study-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v5
+        with: { node-version: '22.16.0', cache: npm }
+      - name: Assert frozen checkpoint refs
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse origin/research/control-n1-freeze)" = "b717a70b685f382044276b7a30bec5b556e94e9c"
+          test "$(git rev-parse origin/research/control-n2-freeze)" = "dbb60df8f509aa0fe461db015445b28d0e78b5cc"
+          test "$(git rev-parse origin/research/control-n3-freeze)" = "a150e2039a5f35c6dabb6bb8cb6eed8ca6d9532e"
+          test "$(git rev-parse origin/research/control-n4-freeze)" = "b9178428d31e4b608457b3c7af103d723da92781"
+          test "$(git rev-parse origin/research/control-n5-freeze)" = "ef2da8c90773f3c3b79c4e7a0f1576a801bd3283"
+          test "$(git rev-parse origin/research/control-n6-freeze)" = "6fc3288fbb533e1ed841e31748d3bb44c50daa65"
+          test "$(git rev-parse origin/research/control-n7-freeze)" = "09bfc0479a5f55d8d7476c5d23f37d9760f4cb02"
+      - name: Install
+        run: npm ci --no-fund --no-audit
+      - name: Build
+        run: npm run build
+      - name: Playwright Chromium
+        run: |
+          npm install --global playwright@1.55.0 --no-fund --no-audit
+          playwright install --with-deps chromium
+          echo "NODE_PATH=$(npm root -g)" >> "$GITHUB_ENV"
+      - name: Preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/control-study-preview.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/control-study-preview.log
+          exit 1
+      - name: Physical N1 to N7 Study Build journey
+        env:
+          APULAB_BASE_URL: http://127.0.0.1:4173
+        run: node tests/e2e/mission01-control-study-build.cjs
+      - name: Upload final Study Build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: control-study-build-final-evidence
+          path: test-results/control-study-build
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Preview log on failure
+        if: failure()
+        run: cat /tmp/control-study-preview.log || true
